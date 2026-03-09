@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>AI Travel Planner India</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+/* GLOBAL */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+scroll-behavior:smooth;
+}
+
+/* BODY */
+
+body{
+
+color:white;
+padding:40px;
+
+background:
+linear-gradient(rgba(2,11,36,0.85),rgba(2,11,36,0.95)),
+url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e");
+
+background-size:cover;
+background-position:center;
+background-attachment:fixed;
+
+}
+
+/* NAVBAR */
+
+.navbar{
+
+position:fixed;
+top:0;
+width:100%;
+
+display:flex;
+justify-content:space-between;
+
+padding:15px 50px;
+
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(12px);
+
+z-index:1000;
+
+}
+
+.navbar ul{
+
+display:flex;
+gap:25px;
+list-style:none;
+
+}
+
+.navbar li{
+
+position:relative;
+cursor:pointer;
+
+}
+
+/* HERO */
+
+.hero{
+
+height:80vh;
+
+background:
+linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.8)),
+url("https://images.unsplash.com/photo-1564507592333-c60657eea523");
+
+background-size:cover;
+background-position:center;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+text-align:center;
+
+}
+
+.hero h1{
+
+font-family:'Cinzel',serif;
+font-size:60px;
+color:#facc15;
+
+}
+
+/* PLANNER */
+
+.planner{
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+padding:60px 20px;
+
+}
+
+.card{
+
+width:100%;
+max-width:750px;
+
+padding:30px;
+
+background:rgba(255,255,255,0.08);
+border-radius:20px;
+
+backdrop-filter:blur(15px);
+
+box-shadow:0 10px 40px rgba(0,0,0,0.6);
+
+}
+
+.trip-row{
+display:flex;
+gap:20px;
+align-items:center;
+}
+
+.trip-row-2{
+display:flex;
+gap:20px;
+margin-top:20px;
+}
+
+.input-box{
+flex:1;
+display:flex;
+flex-direction:column;
+position:relative;
+}
+
+.input-box label{
+margin-bottom:6px;
+}
+
+.input-box input{
+
+padding:14px;
+border:none;
+border-radius:10px;
+
+transition:all 0.3s ease;
+
+}
+
+.input-box input:focus{
+
+outline:none;
+box-shadow:0 0 15px rgba(0,198,255,0.5);
+transform:translateY(-2px);
+background-color:#f0f0f0;
+
+}
+
+.input-box input:hover{
+
+box-shadow:0 0 10px rgba(0,198,255,0.3);
+
+}
+
+/* AUTOCOMPLETE SUGGESTIONS */
+
+.suggestions-dropdown{
+
+position:absolute;
+top:100%;
+left:0;
+right:0;
+
+background:rgba(255,255,255,0.95);
+border-radius:10px;
+
+max-height:200px;
+overflow-y:auto;
+
+margin-top:5px;
+
+box-shadow:0 5px 20px rgba(0,0,0,0.3);
+
+z-index:1000;
+
+animation:slideDown 0.3s ease;
+
+}
+
+.suggestion-item{
+
+padding:12px 15px;
+cursor:pointer;
+color:#333;
+border-bottom:1px solid #eee;
+
+transition:all 0.2s ease;
+
+}
+
+.suggestion-item:hover{
+
+background-color:#00c6ff;
+color:white;
+padding-left:20px;
+
+}
+
+.suggestion-item:last-child{
+
+border-bottom:none;
+
+}
+
+@keyframes slideDown{
+
+from{
+opacity:0;
+transform:translateY(-10px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+.plan-btn{
+
+width:100%;
+margin-top:25px;
+
+padding:16px;
+
+border:none;
+border-radius:12px;
+
+background:linear-gradient(90deg,#ffb300,#ffd600);
+
+font-weight:600;
+
+cursor:pointer;
+
+transition:all 0.3s ease;
+
+}
+
+.plan-btn:hover{
+
+transform:translateY(-3px);
+box-shadow:0 10px 25px rgba(255,176,0,0.4);
+background:linear-gradient(90deg,#ffc400,#ffdd00);
+
+}
+
+.plan-btn:active{
+
+transform:translateY(-1px);
+
+}
+
+/* POPULAR PLACES */
+
+.places{
+margin-top:80px;
+text-align:center;
+}
+
+.places h2{
+margin-bottom:30px;
+font-size:28px;
+color:#facc15;
+}
+
+.places-grid{
+
+display:grid;
+grid-template-columns:repeat(4,1fr);
+
+gap:25px;
+
+max-width:1100px;
+margin:auto;
+
+}
+
+.place-card{
+
+background:rgba(255,255,255,0.08);
+
+border-radius:15px;
+
+overflow:hidden;
+
+cursor:pointer;
+
+transition:all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+
+}
+
+.place-card:hover{
+
+transform:translateY(-12px);
+box-shadow:0 15px 40px rgba(0,198,255,0.3);
+background:rgba(255,255,255,0.12);
+
+}
+
+.place-card img{
+
+width:100%;
+height:180px;
+
+object-fit:cover;
+
+transition:transform 0.4s ease;
+
+}
+
+.place-card:hover img{
+
+transform:scale(1.1);
+
+}
+
+.place-card h3{
+
+padding:15px;
+
+font-size:18px;
+
+color:white;
+
+transition:color 0.3s ease;
+
+}
+
+.place-card:hover h3{
+
+color:#facc15;
+
+}
+
+/* CARD ANIMATION */
+
+@keyframes fadeInUp{
+
+from{
+opacity:0;
+transform:translateY(30px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+.card{
+
+animation:fadeInUp 0.6s ease;
+
+}
+
+/* PLACE CARDS STAGGER */
+
+.place-card:nth-child(1){
+animation:fadeInUp 0.6s ease 0.1s both;
+}
+
+.place-card:nth-child(2){
+animation:fadeInUp 0.6s ease 0.2s both;
+}
+
+.place-card:nth-child(3){
+animation:fadeInUp 0.6s ease 0.3s both;
+}
+
+.place-card:nth-child(4){
+animation:fadeInUp 0.6s ease 0.4s both;
+}
+
+/* MAP */
+
+#map{
+
+width:100%;
+height:350px;
+
+border-radius:15px;
+
+margin-top:40px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+<div class="logo">Created by Uday_S</div>
+
+
+</nav>
+
+
+<section class="hero">
+
+<div class="hero-text">
+<h1>Discover Incredible India</h1>
+<p>Plan your perfect trip with AI</p>
+</div>
+
+</section>
+
+
+<section class="planner">
+
+<div class="card">
+
+<h2>Plan Your Journey</h2>
+
+<div class="trip-row">
+
+<div class="input-box">
+<label>📍 From</label>
+<input id="fromInput" type="text" placeholder="Starting city">
+</div>
+
+<div class="input-box">
+<label>🏝 Destination</label>
+
+<input id="toInput" type="text" placeholder="Destination" list="places">
+
+<datalist id="places"></datalist>
+
+</div>
+
+</div>
+
+<div class="trip-row-2">
+
+<div class="input-box">
+<label>📅 Trip Duration</label>
+<input id="daysInput" type="number" placeholder="Days">
+</div>
+
+<div class="input-box">
+<label>💰 Budget</label>
+<input id="budgetInput" type="number" placeholder="Budget ₹">
+</div>
+
+</div>
+
+<button class="plan-btn" onclick="goToPlan()">
+✨ Generate AI Travel Plan
+</button>
+
+</div>
+
+</section>
+
+
+<section class="places">
+
+<h2>Popular Places</h2>
+
+<div class="places-grid">
+
+<div class="place-card">
+<img src="https://images.unsplash.com/photo-1564507592333-c60657eea523">
+<h3>Taj Mahal</h3>
+</div>
+
+<div class="place-card">
+<img src="https://images.unsplash.com/photo-1597040663342-45b6af3d91a5">
+<h3>Jaipur</h3>
+</div>
+
+<div class="place-card">
+<img src="https://images.unsplash.com/photo-1506461883276-594a12b11cf3">
+<h3>Kerala</h3>
+</div>
+
+<div class="place-card">
+<img src="https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86">
+<h3>Goa</h3>
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<h2 style="text-align:center;margin-top:60px;">Explore India Map</h2>
+
+<div id="map"></div>
+
+</section>
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+
+/* ================= LOGIN CHECK ================= */
+
+if(!localStorage.getItem("loggedIn")){
+    window.location.href="login.html";
+}
+
+/* ================= MAP ================= */
+
+var map = L.map('map').setView([22.9734,78.6569],5)
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+maxZoom:19
+}).addTo(map)
+
+let allCities = []
+
+/* ================= LOAD AUTOCOMPLETE ================= */
+
+async function loadPlaces(){
+
+let response = await fetch("data/india_places.json")
+let data = await response.json()
+
+let list = document.getElementById("places")
+
+// Collect all cities (states and districts)
+for(let state in data){
+
+let option=document.createElement("option")
+option.value=state
+list.appendChild(option)
+allCities.push(state)
+
+for(let district in data[state]){
+
+let op=document.createElement("option")
+op.value=district
+list.appendChild(op)
+allCities.push(district)
+
+}
+
+}
+
+// Setup smart search for From input
+setupSmartSearch()
+
+}
+
+/* ================= SMART SEARCH ================= */
+
+function setupSmartSearch(){
+
+const fromInput = document.getElementById("fromInput")
+
+fromInput.addEventListener("input", function(){
+
+const searchTerm = this.value.toLowerCase()
+
+if(searchTerm.length === 0){
+hideSuggestions()
+return
+}
+
+const filteredCities = allCities.filter(city => 
+city.toLowerCase().includes(searchTerm)
+).slice(0, 8)
+
+if(filteredCities.length > 0){
+showSuggestions(filteredCities, this)
+}else{
+hideSuggestions()
+}
+
+})
+
+fromInput.addEventListener("blur", function(){
+setTimeout(() => hideSuggestions(), 200)
+})
+
+}
+
+function showSuggestions(cities, inputElement){
+
+hideSuggestions()
+
+const dropdown = document.createElement("div")
+dropdown.className = "suggestions-dropdown"
+dropdown.id = "suggestionsList"
+
+cities.forEach(city => {
+
+const item = document.createElement("div")
+item.className = "suggestion-item"
+item.textContent = city
+
+item.addEventListener("click", function(){
+document.getElementById("fromInput").value = city
+hideSuggestions()
+})
+
+dropdown.appendChild(item)
+
+})
+
+inputElement.parentElement.appendChild(dropdown)
+
+}
+
+function hideSuggestions(){
+
+const dropdown = document.getElementById("suggestionsList")
+if(dropdown){
+dropdown.remove()
+}
+
+}
+
+loadPlaces()
+
+
+/* ================= SAVE INPUT ================= */
+
+function goToPlan(){
+
+let from=document.getElementById("fromInput").value
+let to=document.getElementById("toInput").value
+let days=document.getElementById("daysInput").value
+let budget=document.getElementById("budgetInput").value
+
+if(!from || !to || !days){
+
+alert("Please fill all fields")
+return
+
+}
+
+localStorage.setItem("from",from)
+localStorage.setItem("to",to)
+localStorage.setItem("days",days)
+localStorage.setItem("budget",budget)
+
+window.location.href="plan.html"
+
+}
+
+</script>
+
+</body>
+
+</html>

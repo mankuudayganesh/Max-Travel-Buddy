@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>AI Travel Plan</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+/* BODY */
+
+body{
+margin:0;
+font-family:Poppins;
+color:white;
+padding:40px;
+
+background:
+linear-gradient(rgba(2,11,36,0.85),rgba(2,11,36,0.95)),
+url("https://images.unsplash.com/photo-1506929562872-bb421503ef21");
+
+background-size:cover;
+background-position:center;
+background-attachment:fixed;
+}
+
+/* TITLE */
+
+h1{
+text-align:center;
+margin-bottom:40px;
+font-size:40px;
+
+background:linear-gradient(90deg,#00c6ff,#ffffff,#00c6ff);
+background-clip:text;
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+text-shadow:0 0 25px rgba(0,200,255,0.6);
+}
+
+/* MAIN GRID */
+
+.mainLayout{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:40px;
+max-width:1400px;
+margin:auto;
+}
+
+/* SECTION TITLE */
+
+.leftSection h2{
+margin-bottom:25px;
+font-size:26px;
+color:#ffd166;
+}
+
+/* DAY CARD */
+
+.dayCard{
+background:rgba(255,255,255,0.06);
+border-radius:14px;
+margin-bottom:20px;
+overflow:hidden;
+backdrop-filter:blur(18px);
+border:1px solid rgba(255,255,255,0.08);
+box-shadow:0 8px 30px rgba(0,0,0,0.6);
+}
+
+/* HEADER */
+
+.dayHeader{
+background:linear-gradient(135deg,#1e3c72,#2a5298);
+padding:15px 20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-weight:600;
+}
+
+/* BUDGET */
+
+.dayBudget{
+background:rgba(255,255,255,0.2);
+padding:6px 14px;
+border-radius:20px;
+font-size:13px;
+}
+
+/* CONTENT */
+
+.dayContent{
+padding:20px;
+color:#ddd;
+line-height:1.6;
+}
+
+/* MAP */
+
+#map{
+height:380px;
+border-radius:12px;
+box-shadow:0 10px 30px rgba(0,0,0,0.7);
+}
+
+/* COST BOX */
+
+.costBox{
+background:rgba(255,255,255,0.07);
+backdrop-filter:blur(15px);
+padding:30px;
+border-radius:14px;
+text-align:center;
+margin-top:20px;
+border:1px solid rgba(255,255,255,0.1);
+}
+
+.costBox h2{
+font-size:36px;
+color:#ffd166;
+margin-top:8px;
+}
+
+/* BUTTONS */
+
+button{
+width:100%;
+padding:16px;
+margin-top:15px;
+border:none;
+border-radius:10px;
+font-size:15px;
+cursor:pointer;
+}
+
+.printBtn{
+background:linear-gradient(90deg,#ff5f6d,#ff9966);
+color:white;
+}
+
+.planBtn{
+background:linear-gradient(90deg,#00c6ff,#0072ff);
+color:white;
+}
+
+</style>
+
+<script>
+if(!localStorage.getItem("loggedIn")){
+window.location.href="login.html";
+}
+</script>
+
+</head>
+
+<body>
+
+<h1>🌍 Your AI Travel Plan</h1>
+
+<div class="mainLayout">
+
+<div class="leftSection">
+
+<h2>📅 Day-by-Day Plan</h2>
+
+<div id="itinerary"></div>
+
+</div>
+
+<div>
+
+<div id="map"></div>
+
+<div class="costBox">
+<p>₹ Estimated Total Cost</p>
+<h2 id="totalCost"></h2>
+</div>
+
+<button class="printBtn" onclick="downloadPDF()">
+📥 Download PDF
+</button>
+
+<button class="planBtn" onclick="window.location.href='index.html'">
+🔄 Plan Another Trip
+</button>
+
+</div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+
+/* ================= GET DATA ================= */
+
+let from = localStorage.getItem("from")
+let to = localStorage.getItem("to")
+let days = parseInt(localStorage.getItem("days"))
+let budget = parseInt(localStorage.getItem("budget"))
+
+document.getElementById("totalCost").innerText="₹"+budget
+
+let dailyBudget = Math.floor(budget/days)
+
+/* ================= MAP ================= */
+
+var map = L.map('map').setView([22.9734,78.6569],5)
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+maxZoom:19
+}).addTo(map)
+
+/* ================= GENERATE PLAN ================= */
+
+async function generatePlan(){
+
+let itinerary=""
+
+document.getElementById("itinerary").innerHTML = "Loading your travel plan..."
+
+try {
+
+let response = await fetch("http://127.0.0.1:8001/generate-trip",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+destination:to,
+days:days
+})
+})
+
+let data = await response.json()
+
+let plan = data.plan
+window.plan = plan
+
+plan.forEach(item => {
+
+itinerary += `
+<div class="dayCard">
+
+<div class="dayHeader">
+<span>Day ${item.day} in ${to}</span>
+<span class="dayBudget">₹${dailyBudget}</span>
+</div>
+
+<div class="dayContent">
+📍 <b>Visit:</b> ${item.place} <br><br>
+📸 <b>Nearby:</b> ${item.nearby} <br><br>
+📝 ${item.description}
+</div>
+
+</div>
+`
+
+})
+
+document.getElementById("itinerary").innerHTML = itinerary
+
+} catch (error) {
+
+document.getElementById("itinerary").innerHTML =
+"Error generating travel plan."
+
+}
+
+}
+
+generatePlan()
+
+/* ================= DOWNLOAD PDF ================= */
+
+function downloadPDF(){
+
+let pdfHTML = `
+<div style="font-family:Arial;padding:20px;background:#fff;color:#000">
+
+<h1 style="text-align:center;color:#0a7bdc;">AI Travel Itinerary</h1>
+
+<p><b>From:</b> ${from}</p>
+<p><b>Destination:</b> ${to}</p>
+<p><b>Days:</b> ${days}</p>
+<p><b>Total Budget:</b> ₹${budget}</p>
+
+<hr>
+`
+
+window.plan.forEach(item => {
+
+pdfHTML += `
+<div style="margin:20px 0;padding:15px;border:1px solid #ddd;border-left:5px solid #0a7bdc">
+
+<h3>Day ${item.day}</h3>
+
+<p><b>Visit:</b> ${item.place}</p>
+
+<p><b>Nearby:</b> ${item.nearby}</p>
+
+<p>${item.description}</p>
+
+</div>
+`
+
+})
+
+pdfHTML += `</div>`
+
+const element = document.createElement("div")
+element.innerHTML = pdfHTML
+
+const opt = {
+margin:10,
+filename:`travel_plan_${to}.pdf`,
+image:{type:'jpeg',quality:0.98},
+html2canvas:{scale:2},
+jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+}
+
+html2pdf().set(opt).from(element).save()
+
+}
+
+</script>
+
+</body>
+</html>
