@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,7 +12,6 @@ app = FastAPI(
 )
 
 # ================= CORS =================
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -20,22 +21,18 @@ app.add_middleware(
 )
 
 # ================= MODELS =================
-
 class TripRequest(BaseModel):
     destination: str
     days: int = Field(gt=0)
 
 # ================= HOME =================
-
 @app.get("/")
 def home():
     return {"message": "AI Travel Planner API Running"}
 
 # ================= GENERATE TRIP =================
-
 @app.post("/generate-trip")
 def generate_trip_api(data: TripRequest):
-
     destination = data.destination
     days = data.days
 
@@ -50,9 +47,6 @@ def generate_trip_api(data: TripRequest):
     }
 
 # ================= RUN SERVER =================
-
 if __name__ == "__main__":
-
     import uvicorn
-
     uvicorn.run(app, host="127.0.0.1", port=8001)

@@ -21,13 +21,15 @@
     ],
 
     "hyderabad": [
-      "Charminar",
-      "Golconda Fort",
-      "Hussain Sagar Lake",
-      "Ramoji Film City",
-      "Salar Jung Museum"
-    ],
-
+  "Charminar",
+  "Golconda Fort",
+  "Hussain Sagar Lake",
+  "Ramoji Film City",
+  "Salar Jung Museum",
+  "Jubilee Hills Peddamma Temple",
+  "Balkampet Yellamma Temple",
+  "Durgam Cheruvu"
+],
     "jagtial": [
       "Jagitial Fort",
       "Dharmapuri Lakshmi Narasimha Swamy Temple"
@@ -3237,9 +3239,13 @@
 "Sugavaneswarar Temple"
 ],
 
-"tirunelveli": [
-"Courtallam Waterfalls",
-"Nellaiappar Temple"
+"tiruvannamalai":  [
+  "Arunachala Hill",
+  "Arunachaleswarar Temple",
+  "Ramana Maharshi Ashram",
+  "Skandashram",
+  "Virupaksha Cave",
+  "Sathanur Dam"
 ],
 
 "thanjavur": [
@@ -3372,11 +3378,6 @@
 "tiruvallur": [
 "Pulicat Lake",
 "Veera Raghava Temple"
-],
-
-"tiruvannamalai": [
-"Arunachala Hill",
-"Arunachaleswarar Temple"
 ],
 
 "tenkasi": [
@@ -3917,132 +3918,138 @@
 ]
 
 },
-"west bengal": {
+  "west bengal": {
+    "alipurduar": [
+      "Buxa Tiger Reserve",
+      "Jaldapara National Park",
+      "Siddheswari Kali Temple"
+    ],
+    "bankura": [
+      "Bishnupur Terracotta Temples",
+      "Joypur Forest",
+      "Madan Mohan Temple Bishnupur"
+    ],
+    "birbhum": [
+      "Santiniketan",
+      "Bakreshwar Hot Springs",
+      "Bakreshwar Temple"
+    ],
+    "cooch behar": [
+      "Cooch Behar Palace",
+      "Madan Mohan Temple"
+    ],
+    "dakshin dinajpur": [
+      "Balurghat Riverfront",
+      "Dakshin Dinajpur Temple"
+    ],
+    "darjeeling": [
+      "Darjeeling Hill Station",
+      "Tiger Hill",
+      "Mahakal Temple Darjeeling"
+    ],
+    "hooghly": [
+      "Bandel Church",
+      "Imambara Hooghly",
+      "Tarakeswar Temple"
+    ],
+    "howrah": [
+      "Howrah Bridge",
+      "Botanical Garden",
+      "Belur Math Temple Area"
+    ],
+    "jalpaiguri": [
+      "Gorumara National Park",
+      "Jalpesh Temple"
+    ],
+    "jhargram": [
+      "Jhargram Palace",
+      "Chilkigarh Temple"
+    ],
+    "kalimpong": [
+      "Deolo Hill",
+      "Kalimpong Temple"
+    ],
+    "kolkata": [
+      "Victoria Memorial",
+      "Indian Museum",
+      "Kalighat Kali Temple",
+      "Dakshineswar Kali Temple"
+    ],
+    "malda": [
+      "Adina Mosque Ruins",
+      "Gaur Archaeological Site",
+      "Malda Temple"
+    ],
+    "murshidabad": [
+      "Hazarduari Palace",
+      "Murshidabad Temple"
+    ],
+    "nadia": [
+      "Mayapur ISKCON",
+      "Chaitanya Mahaprabhu Temple"
+    ],
+    "north 24 parganas": [
+      "Sundarbans Area",
+      "Adyapeath Temple"
+    ],
+    "paschim bardhaman": [
+      "Maithon Dam",
+      "Kalyaneshwari Temple"
+    ],
+    "paschim medinipur": [
+      "Garhbeta Hills",
+      "Paschim Medinipur Temple"
+    ],
+    "purba bardhaman": [
+      "Curzon Gate",
+      "108 Shiva Temple Complex"
+    ],
+    "purba medinipur": [
+      "Digha Beach",
+      "Mandarmani Beach",
+      "Kapalkundala Temple"
+    ],
+    "purulia": [
+      "Ayodhya Hills",
+      "Purulia Temple"
+    ],
+    "south 24 parganas": [
+      "Sundarbans National Park",
+      "Sagar Island Temple"
+    ],
+    "uttar dinajpur": [
+      "Kulick Bird Sanctuary",
+      "Uttar Dinajpur Temple"
+    ]
+  },
 
-"alipurduar":[
-"Buxa Tiger Reserve",
-"Jaldapara National Park",
-"Siddheswari Kali Temple"
-],
-
-"bankura":[
-"Bishnupur Terracotta Temples",
-"Joypur Forest",
-"Madan Mohan Temple Bishnupur"
-],
-
-"birbhum":[
-"Santiniketan",
-"Bakreshwar Hot Springs",
-"Bakreshwar Temple"
-],
-
-"cooch behar":[
-"Cooch Behar Palace",
-"Madan Mohan Temple"
-],
-
-"dakshin dinajpur":[
-"Balurghat Riverfront",
-"Dakshin Dinajpur Temple"
-],
-
-"darjeeling":[
-"Darjeeling Hill Station",
-"Tiger Hill",
-"Mahakal Temple Darjeeling"
-],
-
-"hooghly":[
-"Bandel Church",
-"Imambara Hooghly",
-"Tarakeswar Temple"
-],
-
-"howrah":[
-"Howrah Bridge",
-"Botanical Garden",
-"Belur Math Temple Area"
-],
-
-"jalpaiguri":[
-"Gorumara National Park",
-"Jalpesh Temple"
-],
-
-"jhargram":[
-"Jhargram Palace",
-"Chilkigarh Temple"
-],
-
-"kalimpong":[
-"Deolo Hill",
-"Kalimpong Temple"
-],
-
-"kolkata":[
-"Victoria Memorial",
-"Indian Museum",
-"Kalighat Kali Temple",
-"Dakshineswar Kali Temple"
-],
-
-"malda":[
-"Adina Mosque Ruins",
-"Gaur Archaeological Site",
-"Malda Temple"
-],
-
-"murshidabad":[
-"Hazarduari Palace",
-"Murshidabad Temple"
-],
-
-"nadia":[
-"Mayapur ISKCON",
-"Chaitanya Mahaprabhu Temple"
-],
-
-"north 24 parganas":[
-"Sundarbans Area",
-"Adyapeath Temple"
-],
-
-"paschim bardhaman":[
-"Maithon Dam",
-"Kalyaneshwari Temple"
-],
-
-"paschim medinipur":[
-"Garhbeta Hills",
-"Paschim Medinipur Temple"
-],
-
-"purba bardhaman":[
-"Curzon Gate",
-"108 Shiva Temple Complex"
-],
-
-"purba medinipur":[
-"Digha Beach",
-"Mandarmani Beach",
-"Kapalkundala Temple"
-],
-
-"purulia":[
-"Ayodhya Hills",
-"Purulia Temple"
-],
-
-"south 24 parganas":[
-"Sundarbans National Park",
-"Sagar Island Temple"
-],
-
-"uttar dinajpur":[
-"Kulick Bird Sanctuary",
-"Uttar Dinajpur Temple"
-]
-
-}
+  "ladakh": {
+    "leh": [
+      "Leh Palace",
+      "Shanti Stupa",
+      "Magnetic Hill",
+      "Gurudwara Pathar Sahib",
+      "Hall of Fame Museum",
+      "Thiksey Monastery",
+      "Hemis Monastery",
+      "Alchi Monastery",
+      "Nubra Valley",
+      "Diskit Monastery",
+      "Turtuk Village",
+      "Khardung La Pass",
+      "Pangong Tso (Pangong Lake)",
+      "Tso Moriri Lake",
+      "Hanle Observatory"
+    ],
+    "kargil": [
+      "Kargil War Memorial (Drass)",
+      "Suru Valley",
+      "Mulbekh Monastery",
+      "Rangdum Monastery",
+      "Pensi La Pass",
+      "Zanskar Valley (Padum)",
+      "Sani Monastery",
+      "Shargole Monastery"
+    ]
+  }
 }

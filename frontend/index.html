@@ -30,6 +30,8 @@ body{
 color:white;
 padding:40px;
 
+animation:fadeBody 1.2s ease;
+
 background:
 linear-gradient(rgba(2,11,36,0.85),rgba(2,11,36,0.95)),
 url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e");
@@ -38,6 +40,11 @@ background-size:cover;
 background-position:center;
 background-attachment:fixed;
 
+}
+
+@keyframes fadeBody{
+from{opacity:0;}
+to{opacity:1;}
 }
 
 /* NAVBAR */
@@ -57,22 +64,13 @@ background:rgba(255,255,255,0.05);
 backdrop-filter:blur(12px);
 
 z-index:1000;
+transition:all 0.4s ease;
 
 }
 
-.navbar ul{
-
-display:flex;
-gap:25px;
-list-style:none;
-
-}
-
-.navbar li{
-
-position:relative;
-cursor:pointer;
-
+.navbar:hover{
+background:rgba(255,255,255,0.08);
+box-shadow:0 10px 30px rgba(0,0,0,0.4);
 }
 
 /* HERO */
@@ -102,6 +100,22 @@ font-family:'Cinzel',serif;
 font-size:60px;
 color:#facc15;
 
+animation:glowText 3s ease-in-out infinite alternate;
+
+}
+
+@keyframes glowText{
+
+from{
+text-shadow:0 0 10px rgba(255,204,0,0.5),
+0 0 20px rgba(255,204,0,0.3);
+}
+
+to{
+text-shadow:0 0 25px rgba(255,204,0,0.9),
+0 0 60px rgba(255,204,0,0.6);
+}
+
 }
 
 /* PLANNER */
@@ -129,6 +143,19 @@ border-radius:20px;
 backdrop-filter:blur(15px);
 
 box-shadow:0 10px 40px rgba(0,0,0,0.6);
+
+animation:fadeInUp 0.6s ease;
+transition:all 0.4s ease;
+
+}
+
+.card:hover{
+
+transform:translateY(-6px);
+
+box-shadow:
+0 20px 50px rgba(0,0,0,0.7),
+0 0 30px rgba(0,198,255,0.35);
 
 }
 
@@ -168,19 +195,19 @@ transition:all 0.3s ease;
 .input-box input:focus{
 
 outline:none;
-box-shadow:0 0 15px rgba(0,198,255,0.5);
-transform:translateY(-2px);
-background-color:#f0f0f0;
+
+transform:translateY(-3px) scale(1.02);
+
+box-shadow:
+0 0 12px rgba(0,198,255,0.6),
+0 0 25px rgba(0,198,255,0.4);
+
+background:white;
+color:black;
 
 }
 
-.input-box input:hover{
-
-box-shadow:0 0 10px rgba(0,198,255,0.3);
-
-}
-
-/* AUTOCOMPLETE SUGGESTIONS */
+/* AUTOCOMPLETE */
 
 .suggestions-dropdown{
 
@@ -218,31 +245,18 @@ transition:all 0.2s ease;
 
 .suggestion-item:hover{
 
-background-color:#00c6ff;
+background:#00c6ff;
 color:white;
 padding-left:20px;
 
 }
 
-.suggestion-item:last-child{
-
-border-bottom:none;
-
-}
-
 @keyframes slideDown{
-
-from{
-opacity:0;
-transform:translateY(-10px);
+from{opacity:0; transform:translateY(-10px);}
+to{opacity:1; transform:translateY(0);}
 }
 
-to{
-opacity:1;
-transform:translateY(0);
-}
-
-}
+/* BUTTON */
 
 .plan-btn{
 
@@ -262,19 +276,44 @@ cursor:pointer;
 
 transition:all 0.3s ease;
 
+position:relative;
+overflow:hidden;
+
+}
+
+.plan-btn::before{
+
+content:"";
+position:absolute;
+
+top:0;
+left:-100%;
+
+width:100%;
+height:100%;
+
+background:linear-gradient(
+120deg,
+transparent,
+rgba(255,255,255,0.7),
+transparent
+);
+
+transition:0.6s;
+
+}
+
+.plan-btn:hover::before{
+left:100%;
 }
 
 .plan-btn:hover{
 
-transform:translateY(-3px);
-box-shadow:0 10px 25px rgba(255,176,0,0.4);
-background:linear-gradient(90deg,#ffc400,#ffdd00);
+transform:translateY(-5px) scale(1.02);
 
-}
-
-.plan-btn:active{
-
-transform:translateY(-1px);
+box-shadow:
+0 15px 35px rgba(255,176,0,0.5),
+0 0 30px rgba(255,176,0,0.4);
 
 }
 
@@ -313,15 +352,17 @@ overflow:hidden;
 
 cursor:pointer;
 
-transition:all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+transition:all 0.45s cubic-bezier(.17,.67,.41,1.39);
 
 }
 
 .place-card:hover{
 
-transform:translateY(-12px);
-box-shadow:0 15px 40px rgba(0,198,255,0.3);
-background:rgba(255,255,255,0.12);
+transform:translateY(-14px) scale(1.03);
+
+box-shadow:
+0 25px 50px rgba(0,0,0,0.6),
+0 0 30px rgba(0,198,255,0.3);
 
 }
 
@@ -332,22 +373,20 @@ height:180px;
 
 object-fit:cover;
 
-transition:transform 0.4s ease;
+transition:transform 0.6s ease;
 
 }
 
 .place-card:hover img{
 
-transform:scale(1.1);
+transform:scale(1.15) rotate(1deg);
 
 }
 
 .place-card h3{
 
 padding:15px;
-
 font-size:18px;
-
 color:white;
 
 transition:color 0.3s ease;
@@ -355,9 +394,7 @@ transition:color 0.3s ease;
 }
 
 .place-card:hover h3{
-
 color:#facc15;
-
 }
 
 /* CARD ANIMATION */
@@ -376,30 +413,6 @@ transform:translateY(0);
 
 }
 
-.card{
-
-animation:fadeInUp 0.6s ease;
-
-}
-
-/* PLACE CARDS STAGGER */
-
-.place-card:nth-child(1){
-animation:fadeInUp 0.6s ease 0.1s both;
-}
-
-.place-card:nth-child(2){
-animation:fadeInUp 0.6s ease 0.2s both;
-}
-
-.place-card:nth-child(3){
-animation:fadeInUp 0.6s ease 0.3s both;
-}
-
-.place-card:nth-child(4){
-animation:fadeInUp 0.6s ease 0.4s both;
-}
-
 /* MAP */
 
 #map{
@@ -411,6 +424,18 @@ border-radius:15px;
 
 margin-top:40px;
 
+transition:all 0.4s ease;
+
+}
+
+#map:hover{
+
+transform:scale(1.01);
+
+box-shadow:
+0 20px 40px rgba(0,0,0,0.7),
+0 0 25px rgba(0,198,255,0.4);
+
 }
 
 </style>
@@ -420,25 +445,17 @@ margin-top:40px;
 <body>
 
 <nav class="navbar">
-
 <div class="logo">Created by Uday_S</div>
-
-
 </nav>
 
-
 <section class="hero">
-
 <div class="hero-text">
 <h1>Discover Incredible India</h1>
 <p>Plan your perfect trip with AI</p>
 </div>
-
 </section>
 
-
 <section class="planner">
-
 <div class="card">
 
 <h2>Plan Your Journey</h2>
@@ -452,11 +469,8 @@ margin-top:40px;
 
 <div class="input-box">
 <label>🏝 Destination</label>
-
 <input id="toInput" type="text" placeholder="Destination" list="places">
-
 <datalist id="places"></datalist>
-
 </div>
 
 </div>
@@ -480,9 +494,7 @@ margin-top:40px;
 </button>
 
 </div>
-
 </section>
-
 
 <section class="places">
 
@@ -514,7 +526,6 @@ margin-top:40px;
 
 </section>
 
-
 <section>
 
 <h2 style="text-align:center;margin-top:60px;">Explore India Map</h2>
@@ -523,18 +534,17 @@ margin-top:40px;
 
 </section>
 
-
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
 
-/* ================= LOGIN CHECK ================= */
+/* LOGIN CHECK */
 
 if(!localStorage.getItem("loggedIn")){
-    window.location.href="login.html";
+window.location.href="login.html";
 }
 
-/* ================= MAP ================= */
+/* MAP */
 
 var map = L.map('map').setView([22.9734,78.6569],5)
 
@@ -542,9 +552,9 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 maxZoom:19
 }).addTo(map)
 
-let allCities = []
+/* AUTOCOMPLETE */
 
-/* ================= LOAD AUTOCOMPLETE ================= */
+let allCities = []
 
 async function loadPlaces(){
 
@@ -553,7 +563,6 @@ let data = await response.json()
 
 let list = document.getElementById("places")
 
-// Collect all cities (states and districts)
 for(let state in data){
 
 let option=document.createElement("option")
@@ -572,12 +581,11 @@ allCities.push(district)
 
 }
 
-// Setup smart search for From input
 setupSmartSearch()
 
 }
 
-/* ================= SMART SEARCH ================= */
+loadPlaces()
 
 function setupSmartSearch(){
 
@@ -586,11 +594,6 @@ const fromInput = document.getElementById("fromInput")
 fromInput.addEventListener("input", function(){
 
 const searchTerm = this.value.toLowerCase()
-
-if(searchTerm.length === 0){
-hideSuggestions()
-return
-}
 
 const filteredCities = allCities.filter(city => 
 city.toLowerCase().includes(searchTerm)
@@ -602,10 +605,6 @@ showSuggestions(filteredCities, this)
 hideSuggestions()
 }
 
-})
-
-fromInput.addEventListener("blur", function(){
-setTimeout(() => hideSuggestions(), 200)
 })
 
 }
@@ -646,10 +645,7 @@ dropdown.remove()
 
 }
 
-loadPlaces()
-
-
-/* ================= SAVE INPUT ================= */
+/* SAVE INPUT */
 
 function goToPlan(){
 
@@ -659,10 +655,8 @@ let days=document.getElementById("daysInput").value
 let budget=document.getElementById("budgetInput").value
 
 if(!from || !to || !days){
-
 alert("Please fill all fields")
 return
-
 }
 
 localStorage.setItem("from",from)
@@ -677,5 +671,4 @@ window.location.href="plan.html"
 </script>
 
 </body>
-
 </html>

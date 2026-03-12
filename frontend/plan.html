@@ -253,9 +253,15 @@ itinerary += `
 </div>
 
 <div class="dayContent">
+
 📍 <b>Visit:</b> ${item.place} <br><br>
-📸 <b>Nearby:</b> ${item.nearby} <br><br>
+
+🏨 <b>Nearby Stay (Top Rated):</b> ${item.hotel} <br><br>
+
+📸 <b>Nearby Places:</b> ${item.nearby} <br><br>
+
 📝 ${item.description}
+
 </div>
 
 </div>
@@ -302,7 +308,9 @@ pdfHTML += `
 
 <p><b>Visit:</b> ${item.place}</p>
 
-<p><b>Nearby:</b> ${item.nearby}</p>
+<p><b>Nearby Stay:</b> ${item.hotel}</p>
+
+<p><b>Nearby Places:</b> ${item.nearby}</p>
 
 <p>${item.description}</p>
 

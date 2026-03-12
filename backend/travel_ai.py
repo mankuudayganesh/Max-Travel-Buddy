@@ -1,26 +1,45 @@
 import json
 import os
 import random
+from functools import lru_cache
+from groq import Groq
 
-# ================= LOAD JSON DATA =================
-
+# ================= LOAD PLACES JSON =================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 json_path = os.path.join(BASE_DIR, "..", "frontend", "data", "india_places.json")
 
 with open(json_path, encoding="utf-8") as f:
     travel_data = json.load(f)
 
+# ================= GROQ CLIENT =================
+def _get_groq_client():
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        return None
+    return Groq(api_key=api_key)
+
+# ================= FAST HOTEL GENERATOR =================
+@lru_cache(maxsize=500)
+def get_hotels_fast(district, state):
+
+    hotels = [
+        {"hotel": f"{district} Grand Hotel", "rating": 4.5, "area": district},
+        {"hotel": f"{district} Palace Residency", "rating": 4.4, "area": district},
+        {"hotel": f"{district} Comfort Inn", "rating": 4.3, "area": district},
+        {"hotel": f"{district} Royal Stay", "rating": 4.2, "area": district},
+        {"hotel": f"{district} City Lodge", "rating": 4.1, "area": district},
+    ]
+
+    return hotels
 
 # ================= GENERATE TRIP =================
+def generate_trip(destination: str, days: int):
 
-def generate_trip(destination, days):
+    dest = destination.lower().strip()
 
-    destination = destination.lower().strip()
+    candidates = []
 
-    places = []
-
-    # ================= SMART SEARCH =================
-
+    # ================= FIND MATCHING PLACES =================
     for state, districts in travel_data.items():
 
         for district, district_places in districts.items():
@@ -28,79 +47,99 @@ def generate_trip(destination, days):
             state_name = state.lower()
             district_name = district.lower()
 
-            # match state
-            if destination in state_name:
-                places.extend(district_places)
+            if dest in state_name or dest in district_name:
 
-            # match district
-            elif destination in district_name:
-                places.extend(district_places)
+                for p in district_places:
+                    candidates.append({
+                        "state": state,
+                        "district": district,
+                        "place": p
+                    })
 
-            # match place names
             else:
-                for place in district_places:
 
-                    place_name = place.lower()
+                for p in district_places:
 
-                    if destination in place_name or place_name in destination:
-                        places.extend(district_places)
+                    pn = p.lower()
+
+                    if dest in pn or pn in dest:
+
+                        for x in district_places:
+                            candidates.append({
+                                "state": state,
+                                "district": district,
+                                "place": x
+                            })
+
                         break
 
-
     # ================= REMOVE DUPLICATES =================
+    seen = set()
+    unique = []
 
-    places = list(dict.fromkeys(places))
+    for c in candidates:
 
-    # ================= FALLBACK =================
+        key = (c["state"], c["district"], c["place"])
 
-    if not places:
-        places = [
-            "City Tour",
-            "Local Market",
-            "Temple Visit",
-            "Food Street",
-            "Nature Park"
+        if key not in seen:
+            seen.add(key)
+            unique.append(c)
+
+    # ================= FALLBACK PLACES =================
+    if not unique:
+
+        unique = [
+            {"state": "", "district": "", "place": p}
+            for p in [
+                "City Tour",
+                "Local Market",
+                "Temple Visit",
+                "Food Street",
+                "Nature Park"
+            ]
         ]
 
-    random.shuffle(places)
-
-    
-    # ================= FOOD =================
-
-    foods = [
-        "Famous Local Restaurant",
-        "Street Food Market",
-        "Traditional Food Street",
-        "Popular Local Cafe"
-    ]
-
-    # ================= CREATE UNIQUE ITINERARY =================
+    random.shuffle(unique)
 
     itinerary = []
     used_places = set()
 
+    # ================= GENERATE DAY-WISE PLAN =================
     for day in range(days):
 
-        available = [p for p in places if p not in used_places]
+        available = [c for c in unique if c["place"] not in used_places]
 
         if not available:
             break
 
-        place = random.choice(available)
-        used_places.add(place)
+        chosen = random.choice(available)
 
-        nearby_options = [p for p in places if p not in used_places]
+        used_places.add(chosen["place"])
 
-        nearby = random.choice(nearby_options) if nearby_options else "Local Area"
+        remaining_places = [
+            c["place"] for c in unique if c["place"] not in used_places
+        ]
+
+        nearby = random.choice(remaining_places) if remaining_places else "Local Area"
+
+        # FAST HOTEL LOOKUP
+        hotels = get_hotels_fast(chosen["district"], chosen["state"])
+
+        selected = random.choice(hotels)
+
+        hotel_string = f"{selected['hotel']} ({selected['rating']}★, {selected['area']})"
 
         itinerary.append({
 
             "day": day + 1,
-            "place": place,
-            "hotel": random.choice(hotels),
-            "food": random.choice(foods),
+
+            "place": chosen["place"],
+
+            "hotel": hotel_string,
+
             "nearby": nearby,
-            "description": f"Explore {place} and enjoy the culture and attractions of {destination.title()}."
+
+            "description": f"Explore {chosen['place']} and enjoy the culture and attractions of {destination.title()}."
 
         })
 
