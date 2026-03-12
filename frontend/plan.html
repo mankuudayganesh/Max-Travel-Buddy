@@ -13,10 +13,17 @@
 
 <style>
 
+/* RESET */
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
 /* BODY */
 
 body{
-margin:0;
 font-family:Poppins;
 color:white;
 padding:40px;
@@ -28,6 +35,34 @@ url("https://images.unsplash.com/photo-1506929562872-bb421503ef21");
 background-size:cover;
 background-position:center;
 background-attachment:fixed;
+}
+
+/* HERO */
+
+.hero{
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+padding:20px;
+}
+
+/* FORM GRID */
+
+.formGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+}
+
+/* PLAN BOX */
+
+.planBox{
+max-width:500px;
+width:90%;
+margin:auto;
 }
 
 /* TITLE */
@@ -165,7 +200,7 @@ background:linear-gradient(90deg,#00c6ff,#0072ff);
 color:white;
 }
 
-/* ================= MOBILE RESPONSIVE ================= */
+/* MOBILE */
 
 @media (max-width:900px){
 
@@ -208,6 +243,32 @@ font-size:26px;
 button{
 font-size:14px;
 padding:14px;
+}
+
+}
+
+/* SMALL MOBILE */
+
+@media (max-width:768px){
+
+.hero h1{
+font-size:28px;
+}
+
+.planBox{
+padding:20px;
+}
+
+input{
+width:100%;
+}
+
+button{
+width:100%;
+}
+
+.formGrid{
+grid-template-columns:1fr;
 }
 
 }
@@ -262,7 +323,7 @@ window.location.href="login.html";
 
 <script>
 
-/* ================= GET DATA ================= */
+/* GET DATA */
 
 let from = localStorage.getItem("from")
 let to = localStorage.getItem("to")
@@ -273,7 +334,7 @@ document.getElementById("totalCost").innerText="₹"+budget
 
 let dailyBudget = Math.floor(budget/days)
 
-/* ================= MAP ================= */
+/* MAP */
 
 var map = L.map('map').setView([22.9734,78.6569],5)
 
@@ -281,7 +342,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 maxZoom:19
 }).addTo(map)
 
-/* ================= GENERATE PLAN ================= */
+/* GENERATE PLAN */
 
 async function generatePlan(){
 
@@ -347,7 +408,7 @@ document.getElementById("itinerary").innerHTML =
 
 generatePlan()
 
-/* ================= DOWNLOAD PDF ================= */
+/* DOWNLOAD PDF */
 
 function downloadPDF(){
 
