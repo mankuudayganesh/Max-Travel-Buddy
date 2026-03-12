@@ -1,9 +1,12 @@
+```html
 <!DOCTYPE html>
 <html>
 
 <head>
 
 <title>AI Travel Plan</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
@@ -82,6 +85,7 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 font-weight:600;
+flex-wrap:wrap;
 }
 
 /* BUDGET */
@@ -137,6 +141,11 @@ border:none;
 border-radius:10px;
 font-size:15px;
 cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.03);
 }
 
 .printBtn{
@@ -147,6 +156,43 @@ color:white;
 .planBtn{
 background:linear-gradient(90deg,#00c6ff,#0072ff);
 color:white;
+}
+
+/* ================= MOBILE RESPONSIVE ================= */
+
+@media (max-width:900px){
+
+body{
+padding:20px;
+}
+
+.mainLayout{
+grid-template-columns:1fr;
+gap:30px;
+}
+
+#map{
+height:300px;
+}
+
+h1{
+font-size:30px;
+}
+
+.leftSection h2{
+font-size:22px;
+}
+
+.dayHeader{
+flex-direction:column;
+align-items:flex-start;
+gap:8px;
+}
+
+.costBox h2{
+font-size:28px;
+}
+
 }
 
 </style>
@@ -227,13 +273,14 @@ let itinerary=""
 document.getElementById("itinerary").innerHTML = "Loading your travel plan..."
 
 try {
-let response = await fetch("https://max-travel-buddy-t9e9.onrender.com/generate-trip", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-        destination: to,
-        days: days
-    })
+
+let response = await fetch("https://max-travel-buddy-t9e9.onrender.com/generate-trip",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+destination:to,
+days:days
+})
 })
 
 let data = await response.json()
@@ -244,6 +291,7 @@ window.plan = plan
 plan.forEach(item => {
 
 itinerary += `
+
 <div class="dayCard">
 
 <div class="dayHeader">
@@ -264,13 +312,14 @@ itinerary += `
 </div>
 
 </div>
+
 `
 
 })
 
 document.getElementById("itinerary").innerHTML = itinerary
 
-} catch (error) {
+} catch(error){
 
 document.getElementById("itinerary").innerHTML =
 "Error generating travel plan."
@@ -301,6 +350,7 @@ let pdfHTML = `
 window.plan.forEach(item => {
 
 pdfHTML += `
+
 <div style="margin:20px 0;padding:15px;border:1px solid #ddd;border-left:5px solid #0a7bdc">
 
 <h3>Day ${item.day}</h3>
@@ -314,6 +364,7 @@ pdfHTML += `
 <p>${item.description}</p>
 
 </div>
+
 `
 
 })
@@ -339,3 +390,4 @@ html2pdf().set(opt).from(element).save()
 
 </body>
 </html>
+```
