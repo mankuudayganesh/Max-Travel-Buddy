@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 
@@ -54,6 +53,13 @@ grid-template-columns:2fr 1fr;
 gap:40px;
 max-width:1400px;
 margin:auto;
+align-items:start;
+}
+
+/* LEFT SECTION */
+
+.leftSection{
+width:100%;
 }
 
 /* SECTION TITLE */
@@ -111,6 +117,7 @@ line-height:1.6;
 height:380px;
 border-radius:12px;
 box-shadow:0 10px 30px rgba(0,0,0,0.7);
+width:100%;
 }
 
 /* COST BOX */
@@ -172,11 +179,12 @@ gap:30px;
 }
 
 #map{
-height:300px;
+height:280px;
+margin-top:10px;
 }
 
 h1{
-font-size:30px;
+font-size:28px;
 }
 
 .leftSection h2{
@@ -189,8 +197,17 @@ align-items:flex-start;
 gap:8px;
 }
 
+.costBox{
+padding:20px;
+}
+
 .costBox h2{
-font-size:28px;
+font-size:26px;
+}
+
+button{
+font-size:14px;
+padding:14px;
 }
 
 }
@@ -303,7 +320,7 @@ itinerary += `
 
 📍 <b>Visit:</b> ${item.place} <br><br>
 
-🏨 <b>Nearby Stay (Top Rated):</b> ${item.hotel} <br><br>
+🏨 <b>Nearby Stay:</b> ${item.hotel} <br><br>
 
 📸 <b>Nearby Places:</b> ${item.nearby} <br><br>
 
@@ -390,4 +407,3 @@ html2pdf().set(opt).from(element).save()
 
 </body>
 </html>
-```
