@@ -1,470 +1,650 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
-<title>AI Travel Plan</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-<style>
-
-/* RESET */
-
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
-
-/* BODY */
-
-body{
-font-family:Poppins;
-color:white;
-padding:40px;
-
-background:
-linear-gradient(rgba(2,11,36,0.85),rgba(2,11,36,0.95)),
-url("https://images.unsplash.com/photo-1506929562872-bb421503ef21");
-
-background-size:cover;
-background-position:center;
-background-attachment:fixed;
-}
-
-/* HERO */
-
-.hero{
-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-padding:20px;
-}
-
-/* FORM GRID */
-
-.formGrid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:15px;
-}
-
-/* PLAN BOX */
-
-.planBox{
-max-width:500px;
-width:90%;
-margin:auto;
-}
-
-/* TITLE */
-
-h1{
-text-align:center;
-margin-bottom:40px;
-font-size:40px;
-
-background:linear-gradient(90deg,#00c6ff,#ffffff,#00c6ff);
-background-clip:text;
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-
-text-shadow:0 0 25px rgba(0,200,255,0.6);
-}
-
-/* MAIN GRID */
-
-.mainLayout{
-display:grid;
-grid-template-columns:2fr 1fr;
-gap:40px;
-max-width:1400px;
-margin:auto;
-align-items:start;
-}
-
-/* LEFT SECTION */
-
-.leftSection{
-width:100%;
-}
-
-/* SECTION TITLE */
-
-.leftSection h2{
-margin-bottom:25px;
-font-size:26px;
-color:#ffd166;
-}
-
-/* DAY CARD */
-
-.dayCard{
-background:rgba(255,255,255,0.06);
-border-radius:14px;
-margin-bottom:20px;
-overflow:hidden;
-backdrop-filter:blur(18px);
-border:1px solid rgba(255,255,255,0.08);
-box-shadow:0 8px 30px rgba(0,0,0,0.6);
-}
-
-/* HEADER */
-
-.dayHeader{
-background:linear-gradient(135deg,#1e3c72,#2a5298);
-padding:15px 20px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-font-weight:600;
-flex-wrap:wrap;
-}
-
-/* BUDGET */
-
-.dayBudget{
-background:rgba(255,255,255,0.2);
-padding:6px 14px;
-border-radius:20px;
-font-size:13px;
-}
-
-/* CONTENT */
-
-.dayContent{
-padding:20px;
-color:#ddd;
-line-height:1.6;
-}
-
-/* MAP */
-
-#map{
-height:380px;
-border-radius:12px;
-box-shadow:0 10px 30px rgba(0,0,0,0.7);
-width:100%;
-}
-
-/* COST BOX */
-
-.costBox{
-background:rgba(255,255,255,0.07);
-backdrop-filter:blur(15px);
-padding:30px;
-border-radius:14px;
-text-align:center;
-margin-top:20px;
-border:1px solid rgba(255,255,255,0.1);
-}
-
-.costBox h2{
-font-size:36px;
-color:#ffd166;
-margin-top:8px;
-}
-
-/* BUTTONS */
-
-button{
-width:100%;
-padding:16px;
-margin-top:15px;
-border:none;
-border-radius:10px;
-font-size:15px;
-cursor:pointer;
-transition:0.3s;
-}
-
-button:hover{
-transform:scale(1.03);
-}
-
-.printBtn{
-background:linear-gradient(90deg,#ff5f6d,#ff9966);
-color:white;
-}
-
-.planBtn{
-background:linear-gradient(90deg,#00c6ff,#0072ff);
-color:white;
-}
-
-/* MOBILE */
-
-@media (max-width:900px){
-
-body{
-padding:20px;
-}
-
-.mainLayout{
-grid-template-columns:1fr;
-gap:30px;
-}
-
-#map{
-height:280px;
-margin-top:10px;
-}
-
-h1{
-font-size:28px;
-}
-
-.leftSection h2{
-font-size:22px;
-}
-
-.dayHeader{
-flex-direction:column;
-align-items:flex-start;
-gap:8px;
-}
-
-.costBox{
-padding:20px;
-}
-
-.costBox h2{
-font-size:26px;
-}
-
-button{
-font-size:14px;
-padding:14px;
-}
-
-}
-
-/* SMALL MOBILE */
-
-@media (max-width:768px){
-
-.hero h1{
-font-size:28px;
-}
-
-.planBox{
-padding:20px;
-}
-
-input{
-width:100%;
-}
-
-button{
-width:100%;
-}
-
-.formGrid{
-grid-template-columns:1fr;
-}
-
-}
-
-</style>
-
-<script>
-if(!localStorage.getItem("loggedIn")){
-window.location.href="login.html";
-}
-</script>
-
+    <title>AI Travel Plan - Your Itinerary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* ============ NAVBAR ============ */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 50px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .logo i {
+            color: #00d4ff;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ============ HEADER ============ */
+        .header {
+            padding: 120px 50px 50px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .trip-summary {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .summary-item i {
+            font-size: 24px;
+            color: #00d4ff;
+        }
+
+        .summary-item span {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* ============ MAIN LAYOUT ============ */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            max-width: 1400px;
+            margin: auto;
+            padding: 0 50px 80px;
+        }
+
+        /* ============ ITINERARY ============ */
+        .itinerary-section h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #00d4ff;
+        }
+
+        .day-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            transition: 0.4s;
+        }
+
+        .day-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .day-header {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .day-number {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .day-badge {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .day-budget {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .day-content {
+            padding: 25px;
+        }
+
+        .place-info {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .place-image {
+            width: 180px;
+            height: 130px;
+            border-radius: 15px;
+            object-fit: cover;
+        }
+
+        .place-details {
+            flex: 1;
+        }
+
+        .place-name {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .info-item i {
+            color: #00d4ff;
+            width: 20px;
+        }
+
+        .description {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.7;
+        }
+
+        /* ============ SIDEBAR ============ */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+        }
+
+        #map {
+            width: 100%;
+            height: 350px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .cost-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cost-card p {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 10px;
+        }
+
+        .cost-amount {
+            font-size: 42px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #ff5f6d, #ff9966);
+            color: white;
+        }
+
+        .new-plan-btn {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* ============ LOADING ============ */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 30px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .loading-subtext {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        /* ============ ERROR ============ */
+        .error-container {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .error-icon {
+            font-size: 80px;
+            color: #ff5f6d;
+            margin-bottom: 20px;
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                padding: 0 20px 60px;
+            }
+
+            .sidebar {
+                position: relative;
+                top: 0;
+            }
+
+            .header {
+                padding: 100px 20px 40px;
+            }
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .trip-summary {
+                gap: 15px;
+            }
+
+            .place-info {
+                flex-direction: column;
+            }
+
+            .place-image {
+                width: 100%;
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .summary-item {
+                padding: 12px 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-
-<h1>🌍 Your AI Travel Plan</h1>
-
-<div class="mainLayout">
-
-<div class="leftSection">
-
-<h2>📅 Day-by-Day Plan</h2>
-
-<div id="itinerary"></div>
-
-</div>
-
-<div>
-
-<div id="map"></div>
-
-<div class="costBox">
-<p>₹ Estimated Total Cost</p>
-<h2 id="totalCost"></h2>
-</div>
-
-<button class="printBtn" onclick="downloadPDF()">
-📥 Download PDF
-</button>
-
-<button class="planBtn" onclick="window.location.href='index.html'">
-🔄 Plan Another Trip
-</button>
-
-</div>
-
-</div>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-<script>
-
-/* GET DATA */
-
-let from = localStorage.getItem("from")
-let to = localStorage.getItem("to")
-let days = parseInt(localStorage.getItem("days"))
-let budget = parseInt(localStorage.getItem("budget"))
-
-document.getElementById("totalCost").innerText="₹"+budget
-
-let dailyBudget = Math.floor(budget/days)
-
-/* MAP */
-
-var map = L.map('map').setView([22.9734,78.6569],5)
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-maxZoom:19
-}).addTo(map)
-
-/* GENERATE PLAN */
-
-async function generatePlan(){
-
-let itinerary=""
-
-document.getElementById("itinerary").innerHTML = "Loading your travel plan..."
-
-try {
-
-let response = await fetch("https://max-travel-buddy-t9e9.onrender.com/generate-trip",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-destination:to,
-days:days
-})
-})
-
-let data = await response.json()
-
-let plan = data.plan
-window.plan = plan
-
-plan.forEach(item => {
-
-itinerary += `
-
-<div class="dayCard">
-
-<div class="dayHeader">
-<span>Day ${item.day} in ${to}</span>
-<span class="dayBudget">₹${dailyBudget}</span>
-</div>
-
-<div class="dayContent">
-
-📍 <b>Visit:</b> ${item.place} <br><br>
-
-🏨 <b>Nearby Stay:</b> ${item.hotel} <br><br>
-
-📸 <b>Nearby Places:</b> ${item.nearby} <br><br>
-
-📝 ${item.description}
-
-</div>
-
-</div>
-
-`
-
-})
-
-document.getElementById("itinerary").innerHTML = itinerary
-
-} catch(error){
-
-document.getElementById("itinerary").innerHTML =
-"Error generating travel plan."
-
-}
-
-}
-
-generatePlan()
-
-/* DOWNLOAD PDF */
-
-function downloadPDF(){
-
-let pdfHTML = `
-<div style="font-family:Arial;padding:20px;background:#fff;color:#000">
-
-<h1 style="text-align:center;color:#0a7bdc;">AI Travel Itinerary</h1>
-
-<p><b>From:</b> ${from}</p>
-<p><b>Destination:</b> ${to}</p>
-<p><b>Days:</b> ${days}</p>
-<p><b>Total Budget:</b> ₹${budget}</p>
-
-<hr>
-`
-
-window.plan.forEach(item => {
-
-pdfHTML += `
-
-<div style="margin:20px 0;padding:15px;border:1px solid #ddd;border-left:5px solid #0a7bdc">
-
-<h3>Day ${item.day}</h3>
-
-<p><b>Visit:</b> ${item.place}</p>
-
-<p><b>Nearby Stay:</b> ${item.hotel}</p>
-
-<p><b>Nearby Places:</b> ${item.nearby}</p>
-
-<p>${item.description}</p>
-
-</div>
-
-`
-
-})
-
-pdfHTML += `</div>`
-
-const element = document.createElement("div")
-element.innerHTML = pdfHTML
-
-const opt = {
-margin:10,
-filename:`travel_plan_${to}.pdf`,
-image:{type:'jpeg',quality:0.98},
-html2canvas:{scale:2},
-jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
-}
-
-html2pdf().set(opt).from(element).save()
-
-}
-
-</script>
-
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-plane-departure"></i>
+            <span>AI Travel</span>
+        </div>
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Home
+        </a>
+    </nav>
+
+    <!-- Header -->
+    <header class="header">
+        <h1>🌍 Your AI Travel Plan</h1>
+        <div class="trip-summary">
+            <div class="summary-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="fromCity">-</span>
+            </div>
+            <div class="summary-item">
+                <i class="fas fa-arrow-right"></i>
+            </div>
+            <div class="summary-item">
+                <i class="fas fa-flag"></i>
+                <span id="toCity">-</span>
+            </div>
+            <div class="summary-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span id="tripDays">- days</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-layout">
+        <!-- Itinerary -->
+        <div class="itinerary-section">
+            <h2><i class="fas fa-route"></i> Day-by-Day Itinerary</h2>
+            <div id="itinerary">
+                <!-- Loading State -->
+                <div class="loading-container" id="loadingState">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text">Creating your personalized itinerary...</p>
+                    <p class="loading-subtext">Our AI is crafting the perfect trip for you</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div id="map"></div>
+
+            <div class="cost-card">
+                <p>💰 Estimated Total Budget</p>
+                <div class="cost-amount" id="totalCost">₹0</div>
+            </div>
+
+            <button class="action-btn download-btn" onclick="downloadPDF()">
+                <i class="fas fa-download"></i>
+                Download PDF
+            </button>
+
+            <button class="action-btn new-plan-btn" onclick="location.href='index.html'">
+                <i class="fas fa-plus"></i>
+                Plan New Trip
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        // Auth Check
+        if (!localStorage.getItem("loggedIn")) {
+            window.location.href = "login.html";
+        }
+
+        // Get Data
+        const from = localStorage.getItem("from") || "Your City";
+        const to = localStorage.getItem("to") || "Destination";
+        const days = parseInt(localStorage.getItem("days")) || 3;
+        const budget = parseInt(localStorage.getItem("budget")) || 15000;
+
+        // Update UI
+        document.getElementById("fromCity").textContent = from;
+        document.getElementById("toCity").textContent = to;
+        document.getElementById("tripDays").textContent = `${days} days`;
+        document.getElementById("totalCost").textContent = `₹${budget.toLocaleString()}`;
+
+        const dailyBudget = Math.floor(budget / days);
+
+        // Initialize Map
+        var map = L.map('map').setView([22.9734, 78.6569], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        // Store plan for PDF
+        let planData = [];
+
+        // Generate Plan
+        async function generatePlan() {
+            try {
+                const response = await fetch("https://max-travel-buddy-t9e9.onrender.com/generate-trip", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        destination: to,
+                        days: days
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.status === "error") {
+                    throw new Error(data.details);
+                }
+
+                planData = data.plan;
+                renderItinerary(data.plan);
+
+                // Update map
+                updateMap();
+
+            } catch (error) {
+                document.getElementById("itinerary").innerHTML = `
+                    <div class="error-container">
+                        <i class="fas fa-exclamation-triangle error-icon"></i>
+                        <h3>Oops! Something went wrong</h3>
+                        <p>Unable to generate your travel plan. Please try again.</p>
+                        <button class="action-btn new-plan-btn" onclick="location.reload()" style="max-width:300px;margin:20px auto;">
+                            <i class="fas fa-redo"></i> Try Again
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function getPlaceImage(place) {
+            const encoded = encodeURIComponent(place + " india tourism");
+            return `https://source.unsplash.com/400x300/?${encoded}`;
+        }
+
+        function renderItinerary(plan) {
+            let html = '';
+
+            plan.forEach(item => {
+                html += `
+                    <div class="day-card">
+                        <div class="day-header">
+                            <div class="day-number">
+                                <div class="day-badge">${item.day}</div>
+                                <span>Day ${item.day}</span>
+                            </div>
+                            <div class="day-budget">₹${dailyBudget.toLocaleString()}</div>
+                        </div>
+                        <div class="day-content">
+                            <div class="place-info">
+                                <img src="${getPlaceImage(item.place)}" alt="${item.place}" class="place-image" 
+                                     onerror="this.src='https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400'">
+                                <div class="place-details">
+                                    <h3 class="place-name">${item.place}</h3>
+                                    <div class="info-item">
+                                        <i class="fas fa-hotel"></i>
+                                        <span>${item.hotel}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="fas fa-camera"></i>
+                                        <span>Nearby: ${item.nearby}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="description">${item.description}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById("itinerary").innerHTML = html;
+        }
+
+        async function updateMap() {
+            try {
+                // Get destination coordinates
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${to}`);
+                const data = await response.json();
+
+                if (data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lon = parseFloat(data[0].lon);
+
+                    map.setView([lat, lon], 10);
+                    L.marker([lat, lon])
+                        .addTo(map)
+                        .bindPopup(`<b>${to}</b>`)
+                        .openPopup();
+                }
+            } catch (err) {
+                console.log("Map update error:", err);
+            }
+        }
+
+        // Download PDF
+        function downloadPDF() {
+            let pdfContent = `
+                <div style="font-family:Arial;padding:30px;background:#fff;color:#000;">
+                    <h1 style="text-align:center;color:#1a1a2e;margin-bottom:30px;">
+                        🌍 AI Travel Itinerary
+                    </h1>
+                    
+                    <div style="background:#f5f5f5;padding:20px;border-radius:10px;margin-bottom:30px;">
+                        <p><strong>From:</strong> ${from}</p>
+                        <p><strong>Destination:</strong> ${to}</p>
+                        <p><strong>Duration:</strong> ${days} days</p>
+                        <p><strong>Total Budget:</strong> ₹${budget.toLocaleString()}</p>
+                    </div>
+
+                    <h2 style="color:#1a1a2e;border-bottom:2px solid #00d4ff;padding-bottom:10px;">
+                        Day-by-Day Plan
+                    </h2>
+            `;
+
+            planData.forEach(item => {
+                pdfContent += `
+                    <div style="margin:25px 0;padding:20px;border:1px solid #e0e0e0;border-left:4px solid #00d4ff;border-radius:8px;">
+                        <h3 style="color:#1a1a2e;margin-bottom:15px;">Day ${item.day} - ${item.place}</h3>
+                        <p><strong>🏨 Stay:</strong> ${item.hotel}</p>
+                        <p><strong>📸 Nearby:</strong> ${item.nearby}</p>
+                        <p><strong>💰 Budget:</strong> ₹${dailyBudget.toLocaleString()}</p>
+                        <p style="margin-top:10px;color:#555;">${item.description}</p>
+                    </div>
+                `;
+            });
+
+            pdfContent += `
+                    <div style="text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid #e0e0e0;">
+                        <p style="color:#888;">Generated by AI Travel Planner</p>
+                    </div>
+                </div>
+            `;
+
+            const element = document.createElement('div');
+            element.innerHTML = pdfContent;
+
+            html2pdf().set({
+                margin: 15,
+                filename: `Travel_Plan_${to}_${days}days.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(element).save();
+        }
+
+        // Start
+        generatePlan();
+    </script>
 </body>
 </html>

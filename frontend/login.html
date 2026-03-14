@@ -1,170 +1,654 @@
 <!DOCTYPE html>
 <html>
-
 <head>
+    <title>Login - AI Travel Planner India</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 
-<title>Login - AI Travel Planner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
 
-<style>
+        /* ============ SLIDESHOW BACKGROUND ============ */
+        .bg-slideshow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
+        .bg-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: slideShow 24s infinite;
+        }
 
-body{
-font-family:'Poppins',sans-serif;
-color:white;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
+        .bg-slide:nth-child(1) {
+            background-image: url('https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1920');
+            animation-delay: 0s;
+        }
 
-background:
-linear-gradient(rgba(2,11,36,0.85),rgba(2,11,36,0.95)),
-url("https://images.unsplash.com/photo-1564507592333-c60657eea523");
+        .bg-slide:nth-child(2) {
+            background-image: url('https://images.unsplash.com/photo-1599661046289-e31897846e41?w=1920');
+            animation-delay: 6s;
+        }
 
-background-size:cover;
-background-position:center;
-}
+        .bg-slide:nth-child(3) {
+            background-image: url('https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1920');
+            animation-delay: 12s;
+        }
 
-.login-box{
-background:rgba(20,30,60,0.7);
-padding:50px;
-border-radius:20px;
-width:400px;
-text-align:center;
+        .bg-slide:nth-child(4) {
+            background-image: url('https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=1920');
+            animation-delay: 18s;
+        }
 
-backdrop-filter:blur(15px);
-border:1px solid rgba(255,255,255,0.1);
+        @keyframes slideShow {
+            0% { opacity: 0; transform: scale(1); }
+            4% { opacity: 1; }
+            25% { opacity: 1; }
+            29% { opacity: 0; transform: scale(1.1); }
+            100% { opacity: 0; }
+        }
 
-box-shadow:
-0 20px 60px rgba(0,0,0,0.5),
-0 0 30px rgba(0,198,255,0.2);
-}
+        /* Dark Overlay */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(15, 12, 41, 0.85), rgba(48, 43, 99, 0.85), rgba(36, 36, 62, 0.9));
+            z-index: -1;
+        }
 
-.login-box h2{
-font-size:32px;
-margin-bottom:10px;
-background:linear-gradient(90deg,#00c6ff,#ffffff);
-background-clip:text;
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-}
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
 
-.login-box p{
-color:#aaa;
-font-size:14px;
-margin-bottom:30px;
-}
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            animation: floatParticle 20s infinite;
+        }
 
-input{
-width:100%;
-padding:14px;
-margin:12px 0;
+        .particle:nth-child(1) { left: 10%; animation-delay: 0s; width: 8px; height: 8px; }
+        .particle:nth-child(2) { left: 20%; animation-delay: 2s; width: 12px; height: 12px; }
+        .particle:nth-child(3) { left: 30%; animation-delay: 4s; width: 6px; height: 6px; }
+        .particle:nth-child(4) { left: 40%; animation-delay: 1s; width: 10px; height: 10px; }
+        .particle:nth-child(5) { left: 50%; animation-delay: 3s; width: 14px; height: 14px; }
+        .particle:nth-child(6) { left: 60%; animation-delay: 5s; width: 8px; height: 8px; }
+        .particle:nth-child(7) { left: 70%; animation-delay: 2.5s; width: 11px; height: 11px; }
+        .particle:nth-child(8) { left: 80%; animation-delay: 1.5s; width: 9px; height: 9px; }
+        .particle:nth-child(9) { left: 90%; animation-delay: 4.5s; width: 13px; height: 13px; }
+        .particle:nth-child(10) { left: 15%; animation-delay: 3.5s; width: 7px; height: 7px; }
 
-border:1px solid rgba(255,255,255,0.2);
-border-radius:10px;
-background:rgba(255,255,255,0.08);
-color:white;
-font-size:14px;
-}
+        @keyframes floatParticle {
+            0%, 100% { 
+                transform: translateY(100vh) rotate(0deg); 
+                opacity: 0; 
+            }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { 
+                transform: translateY(-100vh) rotate(720deg); 
+                opacity: 0; 
+            }
+        }
 
-button{
-width:100%;
-padding:14px;
-margin:10px 0;
+        /* ============ LOGIN CONTAINER ============ */
+        .login-container {
+            width: 450px;
+            padding: 50px 45px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(25px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.5),
+                0 0 100px rgba(0, 212, 255, 0.1),
+                inset 0 0 60px rgba(255, 255, 255, 0.02);
+            animation: slideUp 1s ease;
+        }
 
-background:linear-gradient(90deg,#00c6ff,#0072ff);
-border:none;
-border-radius:10px;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(60px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
 
-font-weight:600;
-font-size:15px;
-cursor:pointer;
-color:white;
-}
+        /* Logo */
+        .logo {
+            text-align: center;
+            margin-bottom: 35px;
+        }
 
-button:hover{
-transform:translateY(-2px);
-}
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 35px rgba(255, 215, 0, 0.3);
+            animation: logoFloat 3s ease-in-out infinite;
+        }
 
-.small{
-font-size:13px;
-color:#aaa;
-margin-top:10px;
-cursor:pointer;
-}
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
 
-</style>
+        .logo-icon i {
+            font-size: 36px;
+            color: white;
+        }
 
+        .logo h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .logo p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: 0.4s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #000;
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: 22px;
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 18px;
+            transition: 0.3s;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 18px 20px 18px 55px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.4s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #ffd700;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .input-group input:focus ~ i {
+            color: #ffd700;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #000;
+            margin-bottom: 18px;
+            box-shadow: 0 15px 35px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 45px rgba(255, 215, 0, 0.4);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 28px 0;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+        .divider span {
+            padding: 0 18px;
+        }
+
+        /* Google Button */
+        .btn-google {
+            background: white;
+            color: #333;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-google:hover {
+            background: #f8f8f8;
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-google img {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Switch Mode */
+        .switch-mode {
+            text-align: center;
+            margin-top: 28px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        .switch-mode a {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .switch-mode a:hover {
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            padding: 20px 35px;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            color: white;
+            border-radius: 15px;
+            font-size: 15px;
+            display: none;
+            animation: slideIn 0.5s ease;
+            z-index: 1000;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(0, 0, 0, 0.2);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Location Label */
+        .location-label {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 12px 25px;
+            border-radius: 30px;
+            color: white;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 2s ease;
+        }
+
+        .location-label i {
+            color: #ffd700;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            .login-container {
+                width: 95%;
+                padding: 40px 25px;
+                margin: 20px;
+            }
+
+            .logo h1 {
+                font-size: 24px;
+            }
+
+            .location-label {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <!-- Background Slideshow -->
+    <div class="bg-slideshow">
+        <div class="bg-slide"></div>
+        <div class="bg-slide"></div>
+        <div class="bg-slide"></div>
+        <div class="bg-slide"></div>
+    </div>
 
-<div class="login-box">
+    <!-- Overlay -->
+    <div class="bg-overlay"></div>
 
-<h2>AI Travel Planner</h2>
-<p>Login to continue your journey</p>
+    <!-- Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
 
-<input id="email" placeholder="Enter Email">
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
 
-<input id="password" type="password" placeholder="Enter Password">
+    <!-- Login Container -->
+    <div class="login-container">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-om"></i>
+            </div>
+            <h1>Incredible India</h1>
+            <p>AI-Powered Travel Planner</p>
+        </div>
 
-<button onclick="login()">Login</button>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+            <button class="tab-btn" onclick="switchTab('signup')">Sign Up</button>
+        </div>
 
-<button onclick="signup()">Create Account</button>
+        <form id="loginForm">
+            <div class="input-group">
+                <input type="email" id="email" placeholder="Email Address" required>
+                <i class="fas fa-envelope"></i>
+            </div>
 
-<p class="small">First time? Click Create Account</p>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Password" required>
+                <i class="fas fa-lock"></i>
+            </div>
 
-</div>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <span id="btnText">Login</span>
+            </button>
+        </form>
 
-<script>
+        <div class="divider">
+            <span>or continue with</span>
+        </div>
 
-function signup(){
+        <button class="btn btn-google" onclick="googleSignIn()">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+            Sign in with Google
+        </button>
 
-let email=document.getElementById("email").value;
-let password=document.getElementById("password").value;
+        <div class="switch-mode">
+            <span id="switchText">Don't have an account?</span>
+            <a onclick="switchTab('signup')" id="switchLink">Sign up</a>
+        </div>
+    </div>
 
-if(email=="" || password==""){
-alert("Enter email and password");
-return;
-}
+    <!-- Location Label -->
+    <div class="location-label" id="locationLabel">
+        <i class="fas fa-map-marker-alt"></i>
+        <span id="currentLocation">Taj Mahal, Agra</span>
+    </div>
 
-localStorage.setItem("userEmail",email);
-localStorage.setItem("userPassword",password);
+    <script>
+        // ╔══════════════════════════════════════════════════════════════╗
+        // ║     🔥 PASTE YOUR FIREBASE CONFIG HERE 🔥                    ║
+        // ╚══════════════════════════════════════════════════════════════╝
+        
+       const firebaseConfig = {
+  apiKey: "AIzaSyBUQ_u0WdBFd5brqjWKSEJM0heVfd9nj2g",
+  authDomain: "manku-uday-ganesh.firebaseapp.com",
+  projectId: "manku-uday-ganesh",
+  storageBucket: "manku-uday-ganesh.firebasestorage.app",
+  messagingSenderId: "535541298827",
+  appId: "1:535541298827:web:3f9af8e0cf6b4fc664468e",
+  measurementId: "G-PJVNYVT573"
+};
 
-alert("Account Created! Now login.");
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
 
-}
+        // Background locations
+        const locations = [
+            "Taj Mahal, Agra",
+            "Hawa Mahal, Jaipur",
+            "Kerala Backwaters",
+            "Golden Temple, Amritsar"
+        ];
 
-function login(){
+        let currentSlide = 0;
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % locations.length;
+            document.getElementById('currentLocation').textContent = locations[currentSlide];
+        }, 6000);
 
-let email=document.getElementById("email").value;
-let password=document.getElementById("password").value;
+        let isLoginMode = true;
 
-let savedEmail=localStorage.getItem("userEmail");
-let savedPassword=localStorage.getItem("userPassword");
+        function switchTab(mode) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const btnText = document.getElementById('btnText');
+            const switchText = document.getElementById('switchText');
+            const switchLink = document.getElementById('switchLink');
 
-if(email===savedEmail && password===savedPassword){
+            if (mode === 'login') {
+                isLoginMode = true;
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+                btnText.textContent = 'Login';
+                switchText.textContent = "Don't have an account?";
+                switchLink.textContent = 'Sign up';
+            } else {
+                isLoginMode = false;
+                tabs[1].classList.add('active');
+                tabs[0].classList.remove('active');
+                btnText.textContent = 'Create Account';
+                switchText.textContent = 'Already have an account?';
+                switchLink.textContent = 'Login';
+            }
+        }
 
-localStorage.setItem("loggedIn",true);
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3500);
+        }
 
-window.location.href="index.html";
+        function setLoading(loading) {
+            const btn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            
+            if (loading) {
+                btn.disabled = true;
+                btnText.innerHTML = '<div class="spinner"></div>';
+            } else {
+                btn.disabled = false;
+                btnText.textContent = isLoginMode ? 'Login' : 'Create Account';
+            }
+        }
 
-}
-else{
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-alert("Invalid email or password");
+            setLoading(true);
 
-}
+            try {
+                if (isLoginMode) {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    showToast('Welcome back! ✈️', 'success');
+                } else {
+                    await auth.createUserWithEmailAndPassword(email, password);
+                    showToast('Account created! 🎉', 'success');
+                }
 
-}
+                localStorage.setItem('loggedIn', 'true');
+                localStorage.setItem('userEmail', email);
+                
+                setTimeout(() => window.location.href = 'index.html', 1500);
 
-</script>
+            } catch (error) {
+                showToast(error.message, 'error');
+                setLoading(false);
+            }
+        });
 
+        async function googleSignIn() {
+            try {
+                const result = await auth.signInWithPopup(googleProvider);
+                const user = result.user;
+                
+                localStorage.setItem('loggedIn', 'true');
+                localStorage.setItem('userEmail', user.email);
+                localStorage.setItem('userName', user.displayName);
+                localStorage.setItem('userPhoto', user.photoURL);
+
+                showToast(`Namaste, ${user.displayName}! 🙏`, 'success');
+                setTimeout(() => window.location.href = 'index.html', 1500);
+
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        // Warm up backend
+        fetch('https://max-travel-buddy-t9e9.onrender.com/warmup').catch(() => {});
+    </script>
 </body>
 </html>

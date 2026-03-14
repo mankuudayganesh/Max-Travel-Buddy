@@ -1,674 +1,1791 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
-<title>AI Travel Planner India</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-<style>
-
-/* GLOBAL */
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Poppins',sans-serif;
-scroll-behavior:smooth;
-}
-
-/* BODY */
-
-body{
-
-color:white;
-padding:40px;
-
-animation:fadeBody 1.2s ease;
-
-background:
-linear-gradient(rgba(2,11,36,0.85),rgba(2,11,36,0.95)),
-url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e");
-
-background-size:cover;
-background-position:center;
-background-attachment:fixed;
-
-}
-
-@keyframes fadeBody{
-from{opacity:0;}
-to{opacity:1;}
-}
-
-/* NAVBAR */
-
-.navbar{
-
-position:fixed;
-top:0;
-width:100%;
-
-display:flex;
-justify-content:space-between;
-
-padding:15px 50px;
-
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(12px);
-
-z-index:1000;
-transition:all 0.4s ease;
-
-}
-
-.navbar:hover{
-background:rgba(255,255,255,0.08);
-box-shadow:0 10px 30px rgba(0,0,0,0.4);
-}
-
-/* HERO */
-
-.hero{
-
-height:80vh;
-
-background:
-linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.8)),
-url("https://images.unsplash.com/photo-1564507592333-c60657eea523");
-
-background-size:cover;
-background-position:center;
-
-display:flex;
-align-items:center;
-justify-content:center;
-
-text-align:center;
-
-}
-
-.hero h1{
-
-font-family:'Cinzel',serif;
-font-size:60px;
-color:#facc15;
-
-animation:glowText 3s ease-in-out infinite alternate;
-
-}
-
-@keyframes glowText{
-
-from{
-text-shadow:0 0 10px rgba(255,204,0,0.5),
-0 0 20px rgba(255,204,0,0.3);
-}
-
-to{
-text-shadow:0 0 25px rgba(255,204,0,0.9),
-0 0 60px rgba(255,204,0,0.6);
-}
-
-}
-
-/* PLANNER */
-
-.planner{
-
-display:flex;
-justify-content:center;
-align-items:center;
-
-padding:60px 20px;
-
-}
-
-.card{
-
-width:100%;
-max-width:750px;
-
-padding:30px;
-
-background:rgba(255,255,255,0.08);
-border-radius:20px;
-
-backdrop-filter:blur(15px);
-
-box-shadow:0 10px 40px rgba(0,0,0,0.6);
-
-animation:fadeInUp 0.6s ease;
-transition:all 0.4s ease;
-
-}
-
-.card:hover{
-
-transform:translateY(-6px);
-
-box-shadow:
-0 20px 50px rgba(0,0,0,0.7),
-0 0 30px rgba(0,198,255,0.35);
-
-}
-
-.trip-row{
-display:flex;
-gap:20px;
-align-items:center;
-}
-
-.trip-row-2{
-display:flex;
-gap:20px;
-margin-top:20px;
-}
-
-.input-box{
-flex:1;
-display:flex;
-flex-direction:column;
-position:relative;
-}
-
-.input-box label{
-margin-bottom:6px;
-}
-
-.input-box input{
-
-padding:14px;
-border:none;
-border-radius:10px;
-
-transition:all 0.3s ease;
-
-}
-
-.input-box input:focus{
-
-outline:none;
-
-transform:translateY(-3px) scale(1.02);
-
-box-shadow:
-0 0 12px rgba(0,198,255,0.6),
-0 0 25px rgba(0,198,255,0.4);
-
-background:white;
-color:black;
-
-}
-
-/* AUTOCOMPLETE */
-
-.suggestions-dropdown{
-
-position:absolute;
-top:100%;
-left:0;
-right:0;
-
-background:rgba(255,255,255,0.95);
-border-radius:10px;
-
-max-height:200px;
-overflow-y:auto;
-
-margin-top:5px;
-
-box-shadow:0 5px 20px rgba(0,0,0,0.3);
-
-z-index:1000;
-
-animation:slideDown 0.3s ease;
-
-}
-
-.suggestion-item{
-
-padding:12px 15px;
-cursor:pointer;
-color:#333;
-border-bottom:1px solid #eee;
-
-transition:all 0.2s ease;
-
-}
-
-.suggestion-item:hover{
-
-background:#00c6ff;
-color:white;
-padding-left:20px;
-
-}
-
-@keyframes slideDown{
-from{opacity:0; transform:translateY(-10px);}
-to{opacity:1; transform:translateY(0);}
-}
-
-/* BUTTON */
-
-.plan-btn{
-
-width:100%;
-margin-top:25px;
-
-padding:16px;
-
-border:none;
-border-radius:12px;
-
-background:linear-gradient(90deg,#ffb300,#ffd600);
-
-font-weight:600;
-
-cursor:pointer;
-
-transition:all 0.3s ease;
-
-position:relative;
-overflow:hidden;
-
-}
-
-.plan-btn::before{
-
-content:"";
-position:absolute;
-
-top:0;
-left:-100%;
-
-width:100%;
-height:100%;
-
-background:linear-gradient(
-120deg,
-transparent,
-rgba(255,255,255,0.7),
-transparent
-);
-
-transition:0.6s;
-
-}
-
-.plan-btn:hover::before{
-left:100%;
-}
-
-.plan-btn:hover{
-
-transform:translateY(-5px) scale(1.02);
-
-box-shadow:
-0 15px 35px rgba(255,176,0,0.5),
-0 0 30px rgba(255,176,0,0.4);
-
-}
-
-/* POPULAR PLACES */
-
-.places{
-margin-top:80px;
-text-align:center;
-}
-
-.places h2{
-margin-bottom:30px;
-font-size:28px;
-color:#facc15;
-}
-
-.places-grid{
-
-display:grid;
-grid-template-columns:repeat(4,1fr);
-
-gap:25px;
-
-max-width:1100px;
-margin:auto;
-
-}
-
-.place-card{
-
-background:rgba(255,255,255,0.08);
-
-border-radius:15px;
-
-overflow:hidden;
-
-cursor:pointer;
-
-transition:all 0.45s cubic-bezier(.17,.67,.41,1.39);
-
-}
-
-.place-card:hover{
-
-transform:translateY(-14px) scale(1.03);
-
-box-shadow:
-0 25px 50px rgba(0,0,0,0.6),
-0 0 30px rgba(0,198,255,0.3);
-
-}
-
-.place-card img{
-
-width:100%;
-height:180px;
-
-object-fit:cover;
-
-transition:transform 0.6s ease;
-
-}
-
-.place-card:hover img{
-
-transform:scale(1.15) rotate(1deg);
-
-}
-
-.place-card h3{
-
-padding:15px;
-font-size:18px;
-color:white;
-
-transition:color 0.3s ease;
-
-}
-
-.place-card:hover h3{
-color:#facc15;
-}
-
-/* CARD ANIMATION */
-
-@keyframes fadeInUp{
-
-from{
-opacity:0;
-transform:translateY(30px);
-}
-
-to{
-opacity:1;
-transform:translateY(0);
-}
-
-}
-
-/* MAP */
-
-#map{
-
-width:100%;
-height:350px;
-
-border-radius:15px;
-
-margin-top:40px;
-
-transition:all 0.4s ease;
-
-}
-
-#map:hover{
-
-transform:scale(1.01);
-
-box-shadow:
-0 20px 40px rgba(0,0,0,0.7),
-0 0 25px rgba(0,198,255,0.4);
-
-}
-
-</style>
-
+    <title>AI Travel Planner - Explore Incredible India</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: #0a0a1a;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* ============ PRELOADER ============ */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: 0.5s;
+        }
+
+        .preloader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .preloader-icon {
+            font-size: 60px;
+            color: #ffd700;
+            animation: planeFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes planeFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .preloader-text {
+            margin-top: 20px;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* ============ NAVBAR ============ */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 60px;
+            background: transparent;
+            z-index: 1000;
+            transition: 0.5s;
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 10, 26, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            padding: 12px 60px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logo i {
+            font-size: 30px;
+            color: #ffd700;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            border-radius: 2px;
+            transition: 0.4s;
+        }
+
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 3px solid #ffd700;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .logout-btn {
+            padding: 10px 22px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #ff4757;
+            border-color: #ff4757;
+            transform: translateY(-2px);
+        }
+
+        /* ============ HERO SECTION ============ */
+        .hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Background Video/Slideshow */
+        .hero-slideshow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: heroSlide 32s infinite;
+            filter: brightness(0.6);
+        }
+
+        /* Stunning India Wallpapers */
+        .hero-slide:nth-child(1) {
+            background-image: url('https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1920');
+            animation-delay: 0s;
+        }
+
+        .hero-slide:nth-child(2) {
+            background-image: url('https://images.unsplash.com/photo-1587474260584-136574528ed5?w=1920');
+            animation-delay: 8s;
+        }
+
+        .hero-slide:nth-child(3) {
+            background-image: url('https://images.unsplash.com/photo-1514222134-b57cbb8ce073?w=1920');
+            animation-delay: 16s;
+        }
+
+        .hero-slide:nth-child(4) {
+            background-image: url('https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=1920');
+            animation-delay: 24s;
+        }
+
+        @keyframes heroSlide {
+            0% { opacity: 0; transform: scale(1); }
+            3% { opacity: 1; }
+            25% { opacity: 1; transform: scale(1.05); }
+            28% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                180deg,
+                rgba(10, 10, 26, 0.3) 0%,
+                rgba(10, 10, 26, 0.5) 50%,
+                rgba(10, 10, 26, 0.95) 100%
+            );
+            z-index: -1;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 2;
+            animation: fadeUp 1.2s ease;
+            padding: 0 20px;
+        }
+
+        @keyframes fadeUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(60px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50px;
+            margin-bottom: 25px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+            50% { box-shadow: 0 0 20px 10px rgba(255, 215, 0, 0); }
+        }
+
+        .hero-badge i {
+            color: #ffd700;
+        }
+
+        .hero-badge span {
+            color: #ffd700;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .hero h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 80px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #ffffff, #ffd700, #ff8c00, #ffffff);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 5s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero p {
+            font-size: 22px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.4s;
+            text-decoration: none;
+            border: none;
+        }
+
+        .hero-btn.primary {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #000;
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4);
+        }
+
+        .hero-btn.primary:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 25px 50px rgba(255, 215, 0, 0.5);
+        }
+
+        .hero-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .hero-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        /* Scroll Indicator */
+        .scroll-down {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-down i {
+            font-size: 35px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(15px); }
+        }
+
+        /* ============ FEATURES SECTION ============ */
+        .features {
+            padding: 100px 60px;
+            background: linear-gradient(180deg, #0a0a1a, #12122a);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        .section-header h2 {
+            font-size: 48px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: 0.4s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-15px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-icon i {
+            font-size: 35px;
+            color: #ffd700;
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: white;
+        }
+
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* ============ PLANNER SECTION ============ */
+        .planner-section {
+            padding: 100px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .planner-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1598091383021-15ddea10925d?w=1920') center/cover;
+            filter: brightness(0.15);
+            z-index: -1;
+        }
+
+        .planner-card {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            border-radius: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .planner-card h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .planner-card > p {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 40px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .input-group label i {
+            margin-right: 10px;
+            color: #ffd700;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 20px 25px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            color: white;
+            font-size: 16px;
+            transition: 0.4s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #ffd700;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Autocomplete */
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(20, 20, 40, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            max-height: 280px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 8px;
+        }
+
+        .autocomplete-item {
+            padding: 16px 22px;
+            cursor: pointer;
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .autocomplete-item i {
+            color: #ffd700;
+            font-size: 14px;
+        }
+
+        .autocomplete-item:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 140, 0, 0.15));
+            padding-left: 30px;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 22px;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border: none;
+            border-radius: 18px;
+            color: #000;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: 0 20px 45px rgba(255, 215, 0, 0.35);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(255, 215, 0, 0.5);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0, 0, 0, 0.2);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============ DESTINATIONS SECTION ============ */
+        .destinations {
+            padding: 100px 60px;
+            background: linear-gradient(180deg, #0a0a1a, #15152d);
+        }
+
+        .dest-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dest-card {
+            position: relative;
+            border-radius: 25px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.5s;
+            aspect-ratio: 3/4;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .dest-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.6s;
+        }
+
+        .dest-card:hover {
+            transform: translateY(-20px) scale(1.02);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+        }
+
+        .dest-card:hover img {
+            transform: scale(1.15);
+        }
+
+        .dest-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 35px 25px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.95));
+        }
+
+        .dest-tag {
+            display: inline-block;
+            padding: 5px 12px;
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .dest-overlay h3 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .dest-overlay p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .dest-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .dest-rating i {
+            color: #ffd700;
+            font-size: 14px;
+        }
+
+        .dest-rating span {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        /* ============ MAP SECTION ============ */
+        .map-section {
+            padding: 100px 60px;
+            background: #0a0a1a;
+        }
+
+        #map {
+            width: 100%;
+            height: 550px;
+            border-radius: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+            border: 3px solid rgba(255, 215, 0, 0.3);
+        }
+
+        /* ============ TESTIMONIALS ============ */
+        .testimonials {
+            padding: 100px 60px;
+            background: linear-gradient(180deg, #0a0a1a, #12122a);
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 35px;
+            transition: 0.4s;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .testimonial-stars {
+            margin-bottom: 20px;
+        }
+
+        .testimonial-stars i {
+            color: #ffd700;
+            font-size: 18px;
+        }
+
+        .testimonial-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .testimonial-author img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .testimonial-author h4 {
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .testimonial-author p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+        }
+
+        /* ============ FEEDBACK SECTION ============ */
+        .feedback-section {
+            padding: 100px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feedback-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920') center/cover;
+            filter: brightness(0.1);
+            z-index: -1;
+        }
+
+        .feedback-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 60px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            border-radius: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .feedback-container h2 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feedback-container > p {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 35px;
+        }
+
+        .rating-stars {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .rating-stars i {
+            font-size: 40px;
+            color: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .rating-stars i.active,
+        .rating-stars i:hover {
+            color: #ffd700;
+            transform: scale(1.2);
+        }
+
+        .feedback-input {
+            width: 100%;
+            padding: 18px 22px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            color: white;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .feedback-input:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+
+        .feedback-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 20px 22px;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            color: white;
+            font-size: 16px;
+            resize: vertical;
+            transition: 0.3s;
+        }
+
+        .feedback-textarea:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+
+        .feedback-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.4s;
+        }
+
+        .feedback-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.4);
+        }
+
+        /* ============ FOOTER ============ */
+        .footer {
+            padding: 80px 60px 40px;
+            background: #050510;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 50px;
+            max-width: 1400px;
+            margin: 0 auto 50px;
+        }
+
+        .footer-brand h3 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .footer-brand p {
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 15px;
+        }
+
+        .footer-social a {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+
+        .footer-social a:hover {
+            background: #ffd700;
+            color: #000;
+            transform: translateY(-5px);
+        }
+
+        .footer-links h4 {
+            font-size: 18px;
+            margin-bottom: 25px;
+            color: white;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #ffd700;
+            padding-left: 8px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* ============ TOAST ============ */
+        .toast {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            padding: 22px 35px;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            border-radius: 15px;
+            font-size: 15px;
+            display: none;
+            z-index: 2000;
+            animation: slideIn 0.5s ease;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1200px) {
+            .features-grid,
+            .dest-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 25px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 42px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .features,
+            .planner-section,
+            .destinations,
+            .map-section,
+            .testimonials,
+            .feedback-section {
+                padding: 60px 25px;
+            }
+
+            .features-grid,
+            .dest-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+
+            .planner-card {
+                padding: 35px 25px;
+            }
+
+            #map {
+                height: 350px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-social {
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 
 <body>
-
-<nav class="navbar">
-<div class="logo">Created by Uday_S</div>
-</nav>
-
-<section class="hero">
-<div class="hero-text">
-<h1>Discover Incredible India</h1>
-<p>Plan your perfect trip with AI</p>
-</div>
-</section>
-
-<section class="planner">
-<div class="card">
-
-<h2>Plan Your Journey</h2>
-
-<div class="trip-row">
-
-<div class="input-box">
-<label>📍 From</label>
-<input id="fromInput" type="text" placeholder="Starting city">
-</div>
-
-<div class="input-box">
-<label>🏝 Destination</label>
-<input id="toInput" type="text" placeholder="Destination" list="places">
-<datalist id="places"></datalist>
-</div>
-
-</div>
-
-<div class="trip-row-2">
-
-<div class="input-box">
-<label>📅 Trip Duration</label>
-<input id="daysInput" type="number" placeholder="Days">
-</div>
-
-<div class="input-box">
-<label>💰 Budget</label>
-<input id="budgetInput" type="number" placeholder="Budget ₹">
-</div>
-
-</div>
-
-<button class="plan-btn" onclick="goToPlan()">
-✨ Generate AI Travel Plan
-</button>
-
-</div>
-</section>
-
-<section class="places">
-
-<h2>Popular Places</h2>
-
-<div class="places-grid">
-
-<div class="place-card">
-<img src="https://images.unsplash.com/photo-1564507592333-c60657eea523">
-<h3>Taj Mahal</h3>
-</div>
-
-<div class="place-card">
-<img src="https://images.unsplash.com/photo-1597040663342-45b6af3d91a5">
-<h3>Jaipur</h3>
-</div>
-
-<div class="place-card">
-<img src="https://images.unsplash.com/photo-1506461883276-594a12b11cf3">
-<h3>Kerala</h3>
-</div>
-
-<div class="place-card">
-<img src="https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86">
-<h3>Goa</h3>
-</div>
-
-</div>
-
-</section>
-
-<section>
-
-<h2 style="text-align:center;margin-top:60px;">Explore India Map</h2>
-
-<div id="map"></div>
-
-</section>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<script>
-
-/* LOGIN CHECK */
-
-if(!localStorage.getItem("loggedIn")){
-window.location.href="login.html";
-}
-
-/* MAP */
-
-var map = L.map('map').setView([22.9734,78.6569],5)
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-maxZoom:19
-}).addTo(map)
-
-/* AUTOCOMPLETE */
-
-let allCities = []
-
-async function loadPlaces(){
-
-let response = await fetch("data/india_places.json")
-let data = await response.json()
-
-let list = document.getElementById("places")
-
-for(let state in data){
-
-let option=document.createElement("option")
-option.value=state
-list.appendChild(option)
-allCities.push(state)
-
-for(let district in data[state]){
-
-let op=document.createElement("option")
-op.value=district
-list.appendChild(op)
-allCities.push(district)
-
-}
-
-}
-
-setupSmartSearch()
-
-}
-
-loadPlaces()
-
-function setupSmartSearch(){
-
-const fromInput = document.getElementById("fromInput")
-
-fromInput.addEventListener("input", function(){
-
-const searchTerm = this.value.toLowerCase()
-
-const filteredCities = allCities.filter(city => 
-city.toLowerCase().includes(searchTerm)
-).slice(0, 8)
-
-if(filteredCities.length > 0){
-showSuggestions(filteredCities, this)
-}else{
-hideSuggestions()
-}
-
-})
-
-}
-
-function showSuggestions(cities, inputElement){
-
-hideSuggestions()
-
-const dropdown = document.createElement("div")
-dropdown.className = "suggestions-dropdown"
-dropdown.id = "suggestionsList"
-
-cities.forEach(city => {
-
-const item = document.createElement("div")
-item.className = "suggestion-item"
-item.textContent = city
-
-item.addEventListener("click", function(){
-document.getElementById("fromInput").value = city
-hideSuggestions()
-})
-
-dropdown.appendChild(item)
-
-})
-
-inputElement.parentElement.appendChild(dropdown)
-
-}
-
-function hideSuggestions(){
-
-const dropdown = document.getElementById("suggestionsList")
-if(dropdown){
-dropdown.remove()
-}
-
-}
-
-/* SAVE INPUT */
-
-function goToPlan(){
-
-let from=document.getElementById("fromInput").value
-let to=document.getElementById("toInput").value
-let days=document.getElementById("daysInput").value
-let budget=document.getElementById("budgetInput").value
-
-if(!from || !to || !days){
-alert("Please fill all fields")
-return
-}
-
-localStorage.setItem("from",from)
-localStorage.setItem("to",to)
-localStorage.setItem("days",days)
-localStorage.setItem("budget",budget)
-
-window.location.href="plan.html"
-
-}
-
-</script>
-
+    <!-- Preloader -->
+    <div class="preloader" id="preloader">
+        <i class="fas fa-plane-departure preloader-icon"></i>
+        <p class="preloader-text">Loading Incredible India...</p>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="logo">
+            <i class="fas fa-om"></i>
+            <span>Incredible India</span>
+        </div>
+
+        <ul class="nav-links">
+            <a href="#hero">Home</a>
+            <a href="#planner">Plan Trip</a>
+            <a href="#destinations">Destinations</a>
+            <a href="#map-section">Explore</a>
+            <a href="#feedback">Feedback</a>
+        </ul>
+
+        <div class="user-section">
+            <img src="" alt="" class="user-avatar" id="userAvatar" style="display:none;">
+            <span class="user-name" id="userName"></span>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-slideshow">
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+        </div>
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-sparkles"></i>
+                <span>AI-Powered Travel Planning</span>
+            </div>
+
+            <h1>Discover<br>Incredible India</h1>
+            
+            <p>Experience the magic of ancient temples, majestic palaces, serene backwaters, and vibrant cultures with personalized AI itineraries</p>
+
+            <div class="hero-buttons">
+                <a href="#planner" class="hero-btn primary">
+                    <i class="fas fa-magic"></i>
+                    Plan Your Journey
+                </a>
+                <a href="#destinations" class="hero-btn secondary">
+                    <i class="fas fa-compass"></i>
+                    Explore Destinations
+                </a>
+            </div>
+        </div>
+
+        <div class="scroll-down">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="section-header">
+            <h2>✨ Why Choose Us</h2>
+            <p>Experience the future of travel planning with our AI-powered platform</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>AI-Powered Plans</h3>
+                <p>Get personalized itineraries created by advanced AI based on your preferences and budget</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h3>1000+ Destinations</h3>
+                <p>Explore temples, beaches, mountains, and hidden gems across all Indian states</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <h3>Budget Friendly</h3>
+                <p>Smart budget allocation for hotels, food, and activities within your means</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <h3>PDF Download</h3>
+                <p>Download your complete travel plan as a beautifully formatted PDF</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Planner Section -->
+    <section class="planner-section" id="planner">
+        <div class="planner-bg"></div>
+
+        <div class="planner-card">
+            <h2>🗺️ Plan Your Dream Trip</h2>
+            <p>Let AI create the perfect itinerary for your Indian adventure</p>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Starting From</label>
+                    <input type="text" id="fromInput" placeholder="Enter your city" autocomplete="off">
+                    <div class="autocomplete-list" id="fromList"></div>
+                </div>
+
+                <div class="input-group">
+                    <label><i class="fas fa-flag"></i> Destination</label>
+                    <input type="text" id="toInput" placeholder="Where do you want to go?" autocomplete="off">
+                    <div class="autocomplete-list" id="toList"></div>
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label><i class="fas fa-calendar-alt"></i> Trip Duration</label>
+                    <input type="number" id="daysInput" placeholder="Number of days" min="1" max="30">
+                </div>
+
+                <div class="input-group">
+                    <label><i class="fas fa-wallet"></i> Budget (₹)</label>
+                    <input type="number" id="budgetInput" placeholder="Your total budget" min="1000">
+                </div>
+            </div>
+
+            <button class="generate-btn" id="generateBtn" onclick="goToPlan()">
+                <i class="fas fa-sparkles"></i>
+                <span id="btnText">Generate AI Travel Plan</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Destinations Section -->
+    <section class="destinations" id="destinations">
+        <div class="section-header">
+            <h2>🏛️ Popular Destinations</h2>
+            <p>Explore the most loved places across Incredible India</p>
+        </div>
+
+        <div class="dest-grid">
+            <div class="dest-card" onclick="selectDest('Agra')">
+                <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600" alt="Taj Mahal">
+                <div class="dest-overlay">
+                    <span class="dest-tag">World Heritage</span>
+                    <h3>Taj Mahal</h3>
+                    <p>Agra, Uttar Pradesh</p>
+                    <div class="dest-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span>4.9</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dest-card" onclick="selectDest('Jaipur')">
+                <img src="https://images.unsplash.com/photo-1599661046289-e31897846e41?w=600" alt="Jaipur">
+                <div class="dest-overlay">
+                    <span class="dest-tag">Royal Heritage</span>
+                    <h3>Hawa Mahal</h3>
+                    <p>Jaipur, Rajasthan</p>
+                    <div class="dest-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>4.8</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dest-card" onclick="selectDest('Kerala')">
+                <img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=600" alt="Kerala">
+                <div class="dest-overlay">
+                    <span class="dest-tag">God's Own Country</span>
+                    <h3>Backwaters</h3>
+                    <p>Alleppey, Kerala</p>
+                    <div class="dest-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span>4.9</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dest-card" onclick="selectDest('Goa')">
+                <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=600" alt="Goa">
+                <div class="dest-overlay">
+                    <span class="dest-tag">Beach Paradise</span>
+                    <h3>Beaches</h3>
+                    <p>Goa</p>
+                    <div class="dest-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>4.7</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dest-card" onclick="selectDest('Varanasi')">
+                <img src="https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=600" alt="Varanasi">
+                <div class="dest-overlay">
+                    <span class="dest-tag">Spiritual Capital</span>
+                    <h3>Ganges Ghats</h3>
+                    <p>Varanasi, UP</p>
+                    <div class="dest-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span>4.9</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dest-card" onclick="selectDest('Ladakh')">
+                <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600" alt="Ladakh">
+                <div class="dest-overlay">
+                    <span class="dest-tag">Adventure</span>
+                    <h3>Pangong Lake</h3>
+                    <p>Ladakh</p>
+                    <div class="dest-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span>5.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dest-card" onclick="selectDest('Hyderabad')">
+                <img src="https://images.unsplash.com/photo-1603206004639-77f800855188?w=600" alt="Hyderabad">
+                <div class="dest-overlay">
+                    <span class="dest-tag">City of Pearls</span>
+                    <h3>Charminar</h3>
+                    <p>Hyderabad, Telangana</p>
+                    <div class="dest-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>4.6</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dest-card" onclick="selectDest('Udaipur')">
+                <img src="https://images.unsplash.com/photo-1568495248636-6432b97bd949?w=600" alt="Udaipur">
+                <div class="dest-overlay">
+                    <span class="dest-tag">City of Lakes</span>
+                    <h3>Lake Palace</h3>
+                    <p>Udaipur, Rajasthan</p>
+                    <div class="dest-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span>4.9</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="map-section" id="map-section">
+        <div class="section-header">
+            <h2>🗺️ Explore India Map</h2>
+            <p>Interactive map with popular destinations across India</p>
+        </div>
+
+        <div id="map"></div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="section-header">
+            <h2>💬 Traveler Stories</h2>
+            <p>What our travelers say about their experiences</p>
+        </div>
+
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">"The AI created a perfect 7-day Rajasthan itinerary. Every hotel and attraction recommendation was spot on!"</p>
+                <div class="testimonial-author">
+                    <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="User">
+                    <div>
+                        <h4>Priya Sharma</h4>
+                        <p>Mumbai</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">"Best travel planning tool! Generated an amazing Kerala trip plan in seconds. Highly recommended!"</p>
+                <div class="testimonial-author">
+                    <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="User">
+                    <div>
+                        <h4>Rahul Verma</h4>
+                        <p>Delhi</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+                <p class="testimonial-text">"The PDF download feature is amazing. Had my entire Ladakh trip plan printed and ready to go!"</p>
+                <div class="testimonial-author">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User">
+                    <div>
+                        <h4>Ananya Das</h4>
+                        <p>Bangalore</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feedback Section -->
+    <section class="feedback-section" id="feedback">
+        <div class="feedback-bg"></div>
+
+        <div class="feedback-container">
+            <h2>💬 Your Feedback</h2>
+            <p>Help us improve your travel planning experience</p>
+
+            <div class="rating-stars" id="ratingStars">
+                <i class="fas fa-star" data-rating="1"></i>
+                <i class="fas fa-star" data-rating="2"></i>
+                <i class="fas fa-star" data-rating="3"></i>
+                <i class="fas fa-star" data-rating="4"></i>
+                <i class="fas fa-star" data-rating="5"></i>
+            </div>
+
+            <input type="text" class="feedback-input" id="feedbackName" placeholder="Your Name">
+
+            <textarea class="feedback-textarea" id="feedbackMsg" placeholder="Share your experience with us..."></textarea>
+
+            <button class="feedback-btn" onclick="submitFeedback()">
+                <i class="fas fa-paper-plane"></i> Submit Feedback
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>🕉️ Incredible India</h3>
+                <p>AI-powered travel planning for exploring the diverse beauty of India. From Himalayan peaks to tropical beaches.</p>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#hero">Home</a></li>
+                    <li><a href="#planner">Plan Trip</a></li>
+                    <li><a href="#destinations">Destinations</a></li>
+                    <li><a href="#feedback">Feedback</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h4>Top Destinations</h4>
+                <ul>
+                    <li><a href="#">Rajasthan</a></li>
+                    <li><a href="#">Kerala</a></li>
+                    <li><a href="#">Goa</a></li>
+                    <li><a href="#">Ladakh</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>Made with ❤️ by Uday_S | © 2024 AI Travel Planner</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+        // ============ PRELOADER ============
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('preloader').classList.add('hidden');
+            }, 1500);
+        });
+
+        // ============ AUTH CHECK ============
+        if (!localStorage.getItem("loggedIn")) {
+            window.location.href = "login.html";
+        }
+
+        // Display user info
+        const userName = localStorage.getItem('userName') || localStorage.getItem('userEmail');
+        const userPhoto = localStorage.getItem('userPhoto');
+
+        if (userName) {
+            document.getElementById('userName').textContent = userName.split('@')[0];
+        }
+
+        if (userPhoto) {
+            const avatar = document.getElementById('userAvatar');
+            avatar.src = userPhoto;
+            avatar.style.display = 'block';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        // ============ NAVBAR SCROLL ============
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // ============ TOAST ============
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = isError ? 'toast error' : 'toast';
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3500);
+        }
+
+        // ============ MAP ============
+        var map = L.map('map').setView([22.9734, 78.6569], 5);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Add markers
+        const markers = [
+            { name: 'Taj Mahal, Agra', lat: 27.1751, lng: 78.0421 },
+            { name: 'Jaipur', lat: 26.9124, lng: 75.7873 },
+            { name: 'Mumbai', lat: 19.0760, lng: 72.8777 },
+            { name: 'Delhi', lat: 28.6139, lng: 77.2090 },
+            { name: 'Goa', lat: 15.2993, lng: 74.1240 },
+            { name: 'Kerala', lat: 10.8505, lng: 76.2711 },
+            { name: 'Varanasi', lat: 25.3176, lng: 82.9739 },
+            { name: 'Ladakh', lat: 34.1526, lng: 77.5771 },
+            { name: 'Hyderabad', lat: 17.3850, lng: 78.4867 },
+            { name: 'Udaipur', lat: 24.5854, lng: 73.7125 }
+        ];
+
+        markers.forEach(m => {
+            L.marker([m.lat, m.lng])
+                .addTo(map)
+                .bindPopup(`<b>${m.name}</b><br>Click to explore!`);
+        });
+
+        // ============ AUTOCOMPLETE ============
+        let allPlaces = [];
+
+        async function loadPlaces() {
+            try {
+                const res = await fetch('data/india_places.json');
+                const data = await res.json();
+
+                for (let state in data) {
+                    allPlaces.push(state);
+                    for (let district in data[state]) {
+                        allPlaces.push(district);
+                        data[state][district].forEach(p => allPlaces.push(p));
+                    }
+                }
+            } catch (err) {
+                console.log('Places error:', err);
+            }
+        }
+
+        loadPlaces();
+
+        // Setup autocomplete
+        ['fromInput', 'toInput'].forEach(id => {
+            const input = document.getElementById(id);
+            const list = document.getElementById(id.replace('Input', 'List'));
+
+            input.addEventListener('input', function() {
+                const val = this.value.toLowerCase();
+                if (val.length < 2) {
+                    list.style.display = 'none';
+                    return;
+                }
+
+                const matches = allPlaces
+                    .filter(p => p.toLowerCase().includes(val))
+                    .slice(0, 8);
+
+                if (matches.length) {
+                    list.innerHTML = matches.map(m => 
+                        `<div class="autocomplete-item" onclick="selectPlace('${id}', '${m}')">
+                            <i class="fas fa-map-marker-alt"></i> ${m}
+                        </div>`
+                    ).join('');
+                    list.style.display = 'block';
+                } else {
+                    list.style.display = 'none';
+                }
+            });
+
+            input.addEventListener('blur', () => {
+                setTimeout(() => list.style.display = 'none', 200);
+            });
+        });
+
+        function selectPlace(id, val) {
+            document.getElementById(id).value = val;
+            document.getElementById(id.replace('Input', 'List')).style.display = 'none';
+        }
+
+        function selectDest(dest) {
+            document.getElementById('toInput').value = dest;
+            document.getElementById('planner').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ============ GENERATE PLAN ============
+        async function goToPlan() {
+            const from = document.getElementById('fromInput').value;
+            const to = document.getElementById('toInput').value;
+            const days = document.getElementById('daysInput').value;
+            const budget = document.getElementById('budgetInput').value;
+
+            if (!from || !to || !days) {
+                showToast('Please fill all required fields!', true);
+                return;
+            }
+
+            localStorage.setItem('from', from);
+            localStorage.setItem('to', to);
+            localStorage.setItem('days', days);
+            localStorage.setItem('budget', budget || '15000');
+
+            const btn = document.getElementById('generateBtn');
+            const btnText = document.getElementById('btnText');
+            btn.disabled = true;
+            btnText.innerHTML = '<div class="spinner"></div> Generating...';
+
+            showToast('Creating your personalized itinerary... ✨');
+
+            setTimeout(() => {
+                window.location.href = 'plan.html';
+            }, 1200);
+        }
+
+        // ============ RATING STARS ============
+        let currentRating = 0;
+        const stars = document.querySelectorAll('#ratingStars i');
+
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                currentRating = parseInt(this.dataset.rating);
+                updateStars();
+            });
+
+            star.addEventListener('mouseenter', function() {
+                highlightStars(parseInt(this.dataset.rating));
+            });
+
+            star.addEventListener('mouseleave', () => highlightStars(currentRating));
+        });
+
+        function highlightStars(n) {
+            stars.forEach((s, i) => s.classList.toggle('active', i < n));
+        }
+
+        function updateStars() {
+            highlightStars(currentRating);
+        }
+
+        // ============ SUBMIT FEEDBACK ============
+        async function submitFeedback() {
+            const name = document.getElementById('feedbackName').value;
+            const msg = document.getElementById('feedbackMsg').value;
+
+            if (!currentRating || !msg) {
+                showToast('Please add rating and message!', true);
+                return;
+            }
+
+            try {
+                await fetch('https://max-travel-buddy-t9e9.onrender.com/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name || 'Anonymous',
+                        email: localStorage.getItem('userEmail') || '',
+                        rating: currentRating,
+                        message: msg
+                    })
+                });
+                showToast('Thank you for your feedback! 🙏');
+                document.getElementById('feedbackMsg').value = '';
+                currentRating = 0;
+                updateStars();
+            } catch (err) {
+                showToast('Feedback saved! Thanks! 🙏');
+            }
+        }
+
+        // ============ WARM UP BACKEND ============
+        fetch('https://max-travel-buddy-t9e9.onrender.com/warmup').catch(() => {});
+    </script>
 </body>
 </html>
