@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,7 +46,6 @@
       content:"";
       position:absolute;
       inset:0;
-      /* dark + cinematic overlay so text stays readable */
       background:
         radial-gradient(1200px 600px at 10% 10%, rgba(0,212,255,.16), transparent 55%),
         radial-gradient(1000px 600px at 85% 30%, rgba(124,58,237,.16), transparent 55%),
@@ -71,13 +69,12 @@
       25%{opacity:0}
       100%{opacity:0}
     }
-    /* 6 famous India places (stable Unsplash URLs) */
-    .s1{ animation-delay: 0s;  background-image:url("https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=2400&q=70"); }  /* Taj Mahal */
-    .s2{ animation-delay: 6s;  background-image:url("https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=2400&q=70"); }  /* Hawa Mahal */
-    .s3{ animation-delay: 12s; background-image:url("https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=2400&q=70"); } /* Kerala backwaters */
-    .s4{ animation-delay: 18s; background-image:url("https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=2400&q=70"); } /* Ladakh mountains */
-    .s5{ animation-delay: 24s; background-image:url("https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=2400&q=70"); } /* Varanasi ghats */
-    .s6{ animation-delay: 30s; background-image:url("https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=2400&q=70"); } /* Goa beach */
+    .s1{ animation-delay: 0s;  background-image:url("https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=2400&q=70"); }
+    .s2{ animation-delay: 6s;  background-image:url("https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=2400&q=70"); }
+    .s3{ animation-delay: 12s; background-image:url("https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=2400&q=70"); }
+    .s4{ animation-delay: 18s; background-image:url("https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=2400&q=70"); }
+    .s5{ animation-delay: 24s; background-image:url("https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=2400&q=70"); }
+    .s6{ animation-delay: 30s; background-image:url("https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=2400&q=70"); }
 
     /* Decorative blobs */
     body::before, body::after{
@@ -677,9 +674,9 @@
     // ================= PLAN UI =================
     let planData = [];
 
-    function getPlaceImage(place) {
-      const encoded = encodeURIComponent(place + " india tourism");
-      return `https://source.unsplash.com/900x700/?${encoded}`;
+    function getPlaceImageFallback(place) {
+      // Fallback if Wikipedia has no thumbnail
+      return `https://source.unsplash.com/900x700/?${encodeURIComponent(place)},india,landmark`;
     }
 
     function parseHotel(hotelStr) {
@@ -689,6 +686,74 @@
       if (!m) return { name: raw || "N/A", rating: null, area: null };
       return { name: m[1].trim(), rating: parseFloat(m[2]), area: m[3].trim() };
     }
+
+    // ---------- Wikipedia image loader (place-specific images) ----------
+    const placeImgCache = new Map(); // key -> url
+
+    function cacheKey(place) { return `${place} | ${to}`; }
+
+    async function fetchWikipediaThumbnail(place) {
+      const query = `${place} ${to} India`;
+
+      // Wikipedia search API (CORS enabled)
+      const searchUrl =
+        `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}` +
+        `&format=json&origin=*`;
+
+      const searchRes = await fetch(searchUrl);
+      const searchJson = await searchRes.json();
+      const first = searchJson?.query?.search?.[0];
+      if (!first?.title) return null;
+
+      // Summary API includes thumbnail often
+      const summaryUrl =
+        `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(first.title)}`;
+
+      const sumRes = await fetch(summaryUrl);
+      const sumJson = await sumRes.json();
+      return sumJson?.thumbnail?.source || null;
+    }
+
+    async function resolvePlaceImage(place) {
+      const key = cacheKey(place);
+      if (placeImgCache.has(key)) return placeImgCache.get(key);
+
+      let url = null;
+      try { url = await fetchWikipediaThumbnail(place); } catch (e) { url = null; }
+
+      if (!url) url = getPlaceImageFallback(place);
+
+      placeImgCache.set(key, url);
+      return url;
+    }
+
+    // simple concurrency limiter so we don't spam APIs
+    async function mapLimit(items, limit, worker) {
+      const results = [];
+      const executing = [];
+      for (const item of items) {
+        const p = Promise.resolve().then(() => worker(item));
+        results.push(p);
+
+        if (limit <= items.length) {
+          const e = p.then(() => executing.splice(executing.indexOf(e), 1));
+          executing.push(e);
+          if (executing.length >= limit) await Promise.race(executing);
+        }
+      }
+      return Promise.allSettled(results);
+    }
+
+    async function loadDayImages() {
+      const imgs = Array.from(document.querySelectorAll("img[data-place]"));
+
+      await mapLimit(imgs, 4, async (img) => {
+        const place = img.getAttribute("data-place");
+        const url = await resolvePlaceImage(place);
+        img.src = url;
+      });
+    }
+    // -------------------------------------------------------------------
 
     function renderItinerary(plan) {
       const root = document.getElementById("itinerary");
@@ -717,7 +782,12 @@
 
               <div class="day-body">
                 <div class="thumb">
-                  <img src="${getPlaceImage(item.place)}" alt="${item.place}"
+                  <!-- Place-specific image (Wikipedia first, fallback to Unsplash) -->
+                  <img
+                    data-place="${String(item.place).replace(/"/g, "&quot;")}"
+                    src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=900"
+                    alt="${String(item.place).replace(/"/g, "&quot;")}"
+                    loading="lazy"
                     onerror="this.src='https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=900'">
                   <div class="thumb-label">Day ${item.day}</div>
                 </div>
@@ -786,7 +856,14 @@
         }
 
         planData = data.plan;
+
+        // 1) render
         renderItinerary(planData);
+
+        // 2) load place-specific images
+        loadDayImages();
+
+        // 3) map route
         updateMapRoute();
 
       } catch (error) {
@@ -903,6 +980,3 @@
   </script>
 </body>
 </html>
-```
-
-If you want different India places in the background, tell me 5–6 names (example: “Charminar, Meenakshi Temple, Golden Temple, Mysore Palace, Andaman beach…”) and I’ll replace the background images with those.
